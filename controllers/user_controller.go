@@ -10,6 +10,7 @@ import (
 )
 
 type UserController struct {
+	BaseController
 	userService *services.UserService
 }
 
@@ -55,11 +56,11 @@ func (uc *UserController) GetUser(c *gin.Context) {
 func (uc *UserController) GetUsers(c *gin.Context) {
 	users, err := uc.userService.GetAll()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		uc.Error(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, users)
+	uc.Success(c, users)
 }
 
 // UpdateUser 更新用户

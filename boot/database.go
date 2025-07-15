@@ -15,6 +15,7 @@ func InitDB() {
 	if !utils.FileExists("data/jing-sync.db") {
 		DB, err = gorm.Open(sqlite.Open("data/jing-sync.db"), &gorm.Config{})
 		DB.AutoMigrate(&models.User{}, &models.Engine{}, &models.Job{})
+		DB.Create(&models.User{Username: "admin", Password: "admin"})
 	} else {
 		DB, err = gorm.Open(sqlite.Open("data/jing-sync.db"), &gorm.Config{})
 	}
