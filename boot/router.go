@@ -2,7 +2,6 @@
 
 import (
 	"jing-sync/controllers"
-
 	"github.com/gin-gonic/gin"
 )
 
