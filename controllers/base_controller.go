@@ -10,8 +10,8 @@ type BaseController struct{}
 // Success 成功响应
 func (bc *BaseController) Success(c *gin.Context, data interface{}) {
 	c.JSON(http.StatusOK, gin.H{
+		"success": true,
 		"code":    0,
-		"message": "success",
 		"data":    data,
 	})
 }
@@ -19,8 +19,8 @@ func (bc *BaseController) Success(c *gin.Context, data interface{}) {
 // Error 错误响应
 func (bc *BaseController) Error(c *gin.Context, code int, msg string) {
 	c.JSON(http.StatusOK, gin.H{
+		"success": false,
 		"code":    code,
 		"message": msg,
-		"data":    nil,
 	})
 }
