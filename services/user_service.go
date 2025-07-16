@@ -7,11 +7,11 @@ import (
 )
 
 type UserService struct {
-	db *gorm.DB
+	BaseService[models.User]
 }
 
 func NewUserService(db *gorm.DB) *UserService {
-	return &UserService{db: db}
+	return &UserService{BaseService[models.User]{db: db}}
 }
 
 func (us *UserService) Create(user *models.User) error {

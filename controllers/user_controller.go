@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+	"strconv"
 )
 
 type UserController struct {
@@ -54,7 +55,9 @@ func (uc *UserController) GetUser(c *gin.Context) {
 
 // GetUsers 获取用户列表
 func (uc *UserController) GetUsers(c *gin.Context) {
-	users, err := uc.userService.GetAll()
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+    size, _ := strconv.Atoi(c.DefaultQuery("size", "10"))
+	users, err := uc.userService.GetPageList(page, size)
 	if err != nil {
 		uc.Error(c, http.StatusInternalServerError, err.Error())
 		return

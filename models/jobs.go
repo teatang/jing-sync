@@ -1,12 +1,7 @@
 package models
 
-import "time"
-
 type Job struct {
-	ID        uint      `json:"id" gorm:"primarykey"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	Status    uint8     `json:"status" gorm:"default:1"`
+	BaseModel
 	Remark    string    `json:"remark"`
 	SrcPath   string    `json:"src_path"`
 	DstPath   string    `json:"dst_path"`
