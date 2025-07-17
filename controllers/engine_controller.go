@@ -22,86 +22,85 @@ func NewEngineController(db *gorm.DB) *EngineController {
 
 // CreateUser 创建用户
 func (ec *EngineController) CreateEngine(c *gin.Context) {
-	var user models.User
-	if err := c.ShouldBindJSON(&user); err != nil {
-		uc.Error(c, http.StatusBadRequest, err.Error())
+	var engine models.Engine
+	if err := c.ShouldBindJSON(&engine); err != nil {
+		ec.Error(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	if err := uc.userService.Create(&user); err != nil {
-		uc.Error(c, http.StatusInternalServerError, err.Error())
+	if err := ec.engineService.Create(&engine); err != nil {
+		ec.Error(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	uc.Success(c, user)
+	ec.Success(c, engine)
 }
 
 // GetUser 获取单个用户
-func (uc *UserController) GetUser(c *gin.Context) {
+func (ec *EngineController) GetEngine(c *gin.Context) {
 	id := c.Param("id")
-	user, err := uc.userService.GetByID(id)
+	engine, err := ec.engineService.GetByID(id)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			uc.Error(c, http.StatusNotFound, "User not found")
+			ec.Error(c, http.StatusNotFound, "User not found")
 		} else {
-			uc.Error(c, http.StatusInternalServerError, err.Error())
+			ec.Error(c, http.StatusInternalServerError, err.Error())
 		}
 		return
 	}
-
-	uc.Success(c, user)
+	ec.Success(c, engine)
 }
 
 // GetPageUsers 分页获取用户列表
-func (uc *UserController) GetPageUsers(c *gin.Context) {
+func (ec *EngineController) GetPageEngines(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	size, _ := strconv.Atoi("10")
-	users, err := uc.userService.GetPageList(page, size)
+	engines, err := ec.engineService.GetPageList(page, size)
 	if err != nil {
-		uc.Error(c, http.StatusInternalServerError, err.Error())
+		ec.Error(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	uc.Success(c, users)
+	ec.Success(c, engines)
 }
 
 // UpdateUser 更新用户
-func (uc *UserController) UpdateUser(c *gin.Context) {
-	var user models.User
-	if err := c.ShouldBindJSON(&user); err != nil {
-		uc.Error(c, http.StatusBadRequest, err.Error())
+func (ec *EngineController) UpdateUser(c *gin.Context) {
+	var engine models.Engine
+	if err := c.ShouldBindJSON(&engine); err != nil {
+		ec.Error(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	if err := uc.userService.Update(&user); err != nil {
+	if err := ec.engineService.Update(&engine); err != nil {
 		if err == gorm.ErrRecordNotFound {
-			uc.Error(c, http.StatusNotFound, "User not found")
+			ec.Error(c, http.StatusNotFound, "User not found")
 		} else {
-			uc.Error(c, http.StatusInternalServerError, err.Error())
+			ec.Error(c, http.StatusInternalServerError, err.Error())
 		}
 		return
 	}
 
-	uc.Success(c, user)
+	ec.Success(c, engine)
 }
 
 // DeleteUser 删除用户
-func (uc *UserController) DeleteUser(c *gin.Context) {
-	var user models.User
-	if err := c.ShouldBindJSON(&user); err != nil {
-		uc.Error(c, http.StatusBadRequest, err.Error())
+func (ec *EngineController) DeleteEngine(c *gin.Context) {
+	var engine models.Engine
+	if err := c.ShouldBindJSON(&engine); err != nil {
+		ec.Error(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	id := strconv.Itoa(int(user.ID))
-	if err := uc.userService.Delete(id); err != nil {
+	id := strconv.Itoa(int(engine.ID))
+	if err := ec.engineService.Delete(id); err != nil {
 		if err == gorm.ErrRecordNotFound {
-			uc.Error(c, http.StatusNotFound, "User not found")
+			ec.Error(c, http.StatusNotFound, "User not found")
 		} else {
-			uc.Error(c, http.StatusInternalServerError, err.Error())
+			ec.Error(c, http.StatusInternalServerError, err.Error())
 		}
 		return
 	}
 
-	uc.Success(c, user)
+	ec.Success(c, engine)
 }
