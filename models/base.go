@@ -8,3 +8,7 @@ type BaseModel struct {
 	UpdateTime time.Time `json:"update_time" gorm:"autoUpdateTime"`
 	Status     uint8     `json:"status" gorm:"default:1"`
 }
+
+func (b *BaseModel) GetID() (id int64) {
+    return int64(b.ID)
+}
