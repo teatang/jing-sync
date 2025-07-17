@@ -9,19 +9,19 @@ import (
 	"strconv"
 )
 
-type UserController struct {
+type EngineController struct {
 	BaseController
-	userService *services.UserService
+	engineService *services.EngineService
 }
 
-func NewUserController(db *gorm.DB) *UserController {
-	return &UserController{
-		userService: services.NewUserService(db),
+func NewEngineController(db *gorm.DB) *EngineController {
+	return &EngineController{
+		engineService: services.NewEngineService(db),
 	}
 }
 
 // CreateUser 创建用户
-func (uc *UserController) CreateUser(c *gin.Context) {
+func (ec *EngineController) CreateEngine(c *gin.Context) {
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
 		uc.Error(c, http.StatusBadRequest, err.Error())
