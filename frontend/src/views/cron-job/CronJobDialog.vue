@@ -211,7 +211,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, computed } from "vue";
+import { ref, watch} from "vue";
 import { ElMessage, type CascaderProps } from "element-plus";
 import type { Job, CascaderNode } from "@/types/index";
 import RestClient from "@/utils/rest-client";

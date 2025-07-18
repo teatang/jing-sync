@@ -15,7 +15,7 @@ interface AllEngineListActions {
   fetchAllEngines: () => Promise<void>;
 }
 
-export const useAllEngineListStore = defineStore<string, InfoList<Engine>, AllEngineListActions>(
+export const useAllEngineListStore = defineStore<string, InfoList<Engine>, {}, AllEngineListActions>(
   "allEngineListStore",
   {
     state: () => ({
