@@ -7,9 +7,17 @@ import (
 
 func SetupRouter() *gin.Engine {
 	r := gin.Default()
+	// 设置静态文件目录
+	r.Static("/assets", "./frontend/dist/assets")
+
+	// 网站首页
+	r.GET("/", func(c *gin.Context) {
+		c.File("./frontend/dist/index.html")
+	})
+
 	userController := controllers.NewUserController(DB)
 	engineController := controllers.NewEngineController(DB)
-
+	// 定义API路由
 	api := r.Group("/api")
 	{
 		api.POST("/user", userController.CreateUser)
@@ -21,7 +29,7 @@ func SetupRouter() *gin.Engine {
 		api.POST("/engine", engineController.CreateEngine)
 		api.GET("/engine", engineController.GetPageEngines)
 		api.GET("/engine/:id", engineController.GetEngine)
-		api.PUT("/engine", engineController.UpdateUser)
+		api.PUT("/engine", engineController.UpdateEngine)
 		api.DELETE("/engine", engineController.DeleteEngine)
 	}
 

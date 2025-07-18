@@ -65,7 +65,7 @@ func (ec *EngineController) GetPageEngines(c *gin.Context) {
 }
 
 // UpdateUser 更新用户
-func (ec *EngineController) UpdateUser(c *gin.Context) {
+func (ec *EngineController) UpdateEngine(c *gin.Context) {
 	var engine models.Engine
 	if err := c.ShouldBindJSON(&engine); err != nil {
 		ec.Error(c, http.StatusBadRequest, err.Error())
