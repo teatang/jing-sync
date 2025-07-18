@@ -1,14 +1,29 @@
 package boot
 
 import (
-	"github.com/gin-gonic/gin"
+	"fmt"
 	"jing-sync/controllers"
+	"jing-sync/middlewares"
+
+	"github.com/gin-gonic/gin"
 )
 
 func SetupRouter() *gin.Engine {
 	r := gin.Default()
 	// 设置静态文件目录
 	r.Static("/assets", "./frontend/dist/assets")
+
+	// 设置日志格式
+	r.Use(gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
+		return fmt.Sprintf("[%s] %s %s %d %s\n",
+			param.TimeStamp.Format("2006-01-02 15:04:05"),
+			param.Method,
+			param.Path,
+			param.StatusCode,
+			param.Latency,
+		)
+	}))
+	r.Use(middlewares.Logger())
 
 	// 网站首页
 	r.GET("/", func(c *gin.Context) {
