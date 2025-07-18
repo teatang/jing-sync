@@ -25,7 +25,7 @@ func LoggerInit() {
 	// 文件输出配置（JSON格式+按天分割）
 	writer, _ := rotatelogs.New(
 		filepath.Join("data/logs", "app_%Y%m%d.json"),
-		rotatelogs.WithLinkName("logs/app.json"),
+		rotatelogs.WithLinkName("data/logs/app.json"),
 		rotatelogs.WithRotationTime(24*time.Hour),
 		rotatelogs.WithMaxAge(7*24*time.Hour),
 	)
