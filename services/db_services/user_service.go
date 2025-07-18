@@ -1,4 +1,4 @@
-package services
+package db_services
 
 import (
 	"gorm.io/gorm"

@@ -4,19 +4,19 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"jing-sync/models"
-	"jing-sync/services"
+	"jing-sync/services/db_services"
 	"net/http"
 	"strconv"
 )
 
 type UserController struct {
 	BaseController
-	userService *services.UserService
+	userService *db_services.UserService
 }
 
 func NewUserController(db *gorm.DB) *UserController {
 	return &UserController{
-		userService: services.NewUserService(db),
+		userService: db_services.NewUserService(db),
 	}
 }
 

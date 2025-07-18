@@ -32,6 +32,7 @@ func SetupRouter() *gin.Engine {
 
 	userController := controllers.NewUserController(DB)
 	engineController := controllers.NewEngineController(DB)
+	jobController := controllers.NewJobController(DB)
 	// 定义API路由
 	api := r.Group("/api")
 	{
@@ -46,6 +47,12 @@ func SetupRouter() *gin.Engine {
 		api.GET("/engine/:id", engineController.GetEngine)
 		api.PUT("/engine", engineController.UpdateEngine)
 		api.DELETE("/engine", engineController.DeleteEngine)
+
+		api.POST("/job", jobController.CreateJob)
+		api.GET("/job", jobController.GetPageJobs)
+		api.GET("/job/:id", jobController.GetJob)
+		api.PUT("/job", jobController.UpdateJob)
+		api.DELETE("/job", jobController.DeleteJob)
 	}
 
 	return r

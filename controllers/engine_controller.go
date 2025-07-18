@@ -1,26 +1,26 @@
 package controllers
 
 import (
-	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 	"jing-sync/models"
-	"jing-sync/services"
+	"jing-sync/services/db_services"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 type EngineController struct {
 	BaseController
-	engineService *services.EngineService
+	engineService *db_services.EngineService
 }
 
 func NewEngineController(db *gorm.DB) *EngineController {
 	return &EngineController{
-		engineService: services.NewEngineService(db),
+		engineService: db_services.NewEngineService(db),
 	}
 }
 
-// CreateUser 创建用户
 func (ec *EngineController) CreateEngine(c *gin.Context) {
 	var engine models.Engine
 	if err := c.ShouldBindJSON(&engine); err != nil {
@@ -36,7 +36,6 @@ func (ec *EngineController) CreateEngine(c *gin.Context) {
 	ec.Success(c, engine)
 }
 
-// GetUser 获取单个用户
 func (ec *EngineController) GetEngine(c *gin.Context) {
 	id := c.Param("id")
 	engine, err := ec.engineService.GetByID(id)
@@ -51,7 +50,6 @@ func (ec *EngineController) GetEngine(c *gin.Context) {
 	ec.Success(c, engine)
 }
 
-// GetPageUsers 分页获取用户列表
 func (ec *EngineController) GetPageEngines(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	size, _ := strconv.Atoi("10")
@@ -64,7 +62,6 @@ func (ec *EngineController) GetPageEngines(c *gin.Context) {
 	ec.Success(c, engines)
 }
 
-// UpdateUser 更新用户
 func (ec *EngineController) UpdateEngine(c *gin.Context) {
 	var engine models.Engine
 	if err := c.ShouldBindJSON(&engine); err != nil {
@@ -84,7 +81,6 @@ func (ec *EngineController) UpdateEngine(c *gin.Context) {
 	ec.Success(c, engine)
 }
 
-// DeleteUser 删除用户
 func (ec *EngineController) DeleteEngine(c *gin.Context) {
 	var engine models.Engine
 	if err := c.ShouldBindJSON(&engine); err != nil {
