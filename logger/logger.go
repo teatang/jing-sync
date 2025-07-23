@@ -16,6 +16,7 @@ func LoggerInit() {
 	// 创建一个新的日志记录器
 	Log = logrus.New()
 
+	// 设置日志记录器的报告调用者信息
 	Log.SetReportCaller(true)
 	// 设置控制台日志级别为Info级别
 	Log.SetLevel(logrus.InfoLevel)

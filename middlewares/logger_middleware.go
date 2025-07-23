@@ -1,28 +1,34 @@
 package middlewares
 
 import (
+	"bytes"
+	"encoding/json"
+	"io"
 	"jing-sync/logger"
 	"time"
-	"bytes"
-	"io"
-	"encoding/json"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 )
 
-func Logger() gin.HandlerFunc {
+func LoggerMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		start := time.Now()
-		// 读取原始请求的 Body 数据
-        bodyBytes, _ := io.ReadAll(c.Request.Body)
-        // 将原始的 Body 数据重新放入请求的 Body 中，以便后续的处理函数可以再次读取（重置）
-        c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+
+		// 读取请求体
+		var bodyBytes []byte
+		if c.Request.Body != nil {
+			// 读取原始请求的 Body 数据
+			bodyBytes, _ = io.ReadAll(c.Request.Body)
+			// 将原始的 Body 数据重新放入请求的 Body 中，以便后续的处理函数可以再次读取（重置）
+			c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+		}
+
+		c.Next()
+
 		// 将读取到的 Body 数据转换为 map 类型
 		var bodyMap map[string]interface{}
 		json.Unmarshal(bodyBytes, &bodyMap)
-
-		c.Next()
 
 		logger.Log.WithFields(logrus.Fields{
 			"status":       c.Writer.Status(),

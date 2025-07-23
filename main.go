@@ -17,7 +17,9 @@ func main() {
 	// 初始化路由
 	r := boot.SetupRouter()
 
-	logger.Log.Info(fmt.Sprintf("admin password:%s", password))
+	if password != "" {
+		logger.Log.Info(fmt.Sprintf("admin password:%s", password))
+	}
 	logger.Log.Info("服务启动成功 Port:8888")
 	r.Run(":8888")
 }
