@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"jing-sync/config"
 	"os"
 	"path/filepath"
 	"time"
@@ -24,19 +25,20 @@ func LoggerInit() {
 	Log.SetOutput(os.Stdout)
 	Log.SetFormatter(&logrus.TextFormatter{
 		// 设置时间戳格式
-		FullTimestamp:   true,
+		FullTimestamp: true,
 		// 强制使用颜色
-		ForceColors:     true,
+		ForceColors: true,
 		// 设置时间戳格式
 		TimestampFormat: "2006-01-02 15:04:05",
 	})
 
+	webName := config.Cfg.SiteName
 	// 文件输出配置（JSON格式+按天分割）
 	writer, _ := rotatelogs.New(
 		// 设置日志文件名格式
-		filepath.Join("data/logs", "app_%Y%m%d.json"),
+		filepath.Join("data/logs", webName+"_%Y%m%d.json"),
 		// 设置软链接名
-		rotatelogs.WithLinkName("data/logs/app.json"),
+		// rotatelogs.WithLinkName("data/logs/app.json"),
 		// 设置日志文件轮转时间
 		rotatelogs.WithRotationTime(24*time.Hour),
 		// 设置日志文件最大保存时间
@@ -50,18 +52,18 @@ func LoggerInit() {
 		// 设置字段映射
 		FieldMap: logrus.FieldMap{
 			// 设置时间字段名
-			logrus.FieldKeyTime:  "timestamp",
+			logrus.FieldKeyTime: "timestamp",
 			// 设置日志级别字段名
 			logrus.FieldKeyLevel: "level",
 			// 设置日志消息字段名
-			logrus.FieldKeyMsg:   "message",
+			logrus.FieldKeyMsg: "message",
 		},
 	}
 
 	// 添加文件输出钩子
 	Log.AddHook(&fileHook{
 		// 设置文件写入器
-		Writer:    writer,
+		Writer: writer,
 		// 设置格式化器
 		Formatter: fileFormatter,
 	})

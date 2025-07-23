@@ -1,12 +1,14 @@
 package controllers
 
 import (
-	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 	"jing-sync/models"
 	"jing-sync/services/db_services"
 	"net/http"
 	"strconv"
+	"time"
+
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 type UserController struct {
@@ -54,6 +56,7 @@ func (uc *UserController) GetUser(c *gin.Context) {
 
 // GetPageUsers 分页获取用户列表
 func (uc *UserController) GetPageUsers(c *gin.Context) {
+	time.Sleep(time.Second * 10)
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	size, _ := strconv.Atoi("10")
 	users, err := uc.userService.GetPageList(page, size)

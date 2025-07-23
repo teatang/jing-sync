@@ -1,9 +1,11 @@
 package boot
 
 import (
+	"jing-sync/config"
 	"jing-sync/models"
 	"jing-sync/utils"
 
+	"fmt"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -16,11 +18,12 @@ func InitDB() string {
 
 	utils.EnsureDir("data")
 
-	if !utils.FileExists("data/jing-sync.db") {
-		DB, err = gorm.Open(sqlite.Open("data/jing-sync.db"), &gorm.Config{})
+	dbPath := fmt.Sprintf("data/%s", config.Cfg.DbName)
+	if !utils.FileExists(dbPath) {
+		DB, err = gorm.Open(sqlite.Open(dbPath), &gorm.Config{})
 		password = AutoMigrate(DB)
 	} else {
-		DB, err = gorm.Open(sqlite.Open("data/jing-sync.db"), &gorm.Config{})
+		DB, err = gorm.Open(sqlite.Open(dbPath), &gorm.Config{})
 	}
 	if err != nil {
 		panic(err)

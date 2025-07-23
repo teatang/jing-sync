@@ -1,20 +1,27 @@
 package boot
 
 import (
-	// "fmt"
 	"jing-sync/controllers"
 	"jing-sync/middlewares"
+	"jing-sync/config"
+	"jing-sync/logger"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRouter() *gin.Engine {
+func WebSet() *gin.Engine {
 	r := gin.Default()
 	// 设置静态文件目录
 	r.Static("/assets", "./frontend/dist/assets")
 
+	// 设置timeout中间件
+	config_timeout := config.Cfg.Timeout
+	logger.Log.Infof("web-site timeout: %d minutes", config_timeout)
+	r.Use(middlewares.Timeout(time.Duration(config_timeout)*time.Second))
 	// 设置日志中间件
 	r.Use(middlewares.LoggerMiddleware())
+	
 
 	// 网站首页
 	r.GET("/", func(c *gin.Context) {
@@ -47,4 +54,11 @@ func SetupRouter() *gin.Engine {
 	}
 
 	return r
+}
+
+func timeoutResponse(c *gin.Context) {
+	c.JSON(504, gin.H{
+		"code": 504,
+		"msg":  "请求处理超时",
+	})
 }
