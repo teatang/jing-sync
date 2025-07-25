@@ -6,11 +6,19 @@ import (
 	"jing-sync/utils"
 
 	"fmt"
+
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
 var DB *gorm.DB
+
+func GetDB() *gorm.DB {
+	if DB == nil {
+		InitDB()
+	}
+	return DB
+}
 
 func InitDB() string {
 	var password string

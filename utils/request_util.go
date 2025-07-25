@@ -2,80 +2,82 @@ package utils
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"io"
+	"jing-sync/logger"
 	"net/http"
 	"time"
 )
 
-type RequestConfig struct {
-	URL     string
-	Method  string // GET/POST/PUT/DELETE
+type RequestOption struct {
 	Headers map[string]string
-	Body    interface{} // 支持string/[]byte/struct
-	Timeout time.Duration
+	Timeout time.Duration // 默认30秒
+	Retry   int           // 默认不重试
 }
 
-type Response struct {
-	StatusCode int
-	Body       []byte
-	Header     http.Header
-}
-
-func SendRequest(ctx context.Context, config *RequestConfig) (*Response, error) {
-	// 处理请求体
-	var body io.Reader
-	switch v := config.Body.(type) {
-	case nil:
-		body = nil
-	case string:
-		body = bytes.NewBufferString(v)
-	case []byte:
-		body = bytes.NewBuffer(v)
-	default:
-		jsonData, err := json.Marshal(v)
-		if err != nil {
-			return nil, err
-		}
-		body = bytes.NewBuffer(jsonData)
+func Request(method, url string, body interface{}, opt *RequestOption) ([]byte, error) {
+	if opt == nil {
+		opt = &RequestOption{Timeout: 30 * time.Second}
 	}
 
-	// 创建请求
-	req, err := http.NewRequestWithContext(ctx, config.Method, config.URL, body)
+	logger.Log.Infof("Request: method=%s, url=%s, body=%v, opt=%+v", method, url, body, opt)
+
+	var reader io.Reader
+	if body != nil {
+		switch v := body.(type) {
+		case []byte:
+			reader = bytes.NewBuffer(v)
+		case string:
+			reader = bytes.NewBufferString(v)
+		default:
+			data, err := json.Marshal(body)
+			if err != nil {
+				return nil, err
+			}
+			reader = bytes.NewBuffer(data)
+		}
+	}
+
+	req, err := http.NewRequest(method, url, reader)
 	if err != nil {
 		return nil, err
 	}
 
 	// 设置请求头
-	for k, v := range config.Headers {
+	for k, v := range opt.Headers {
 		req.Header.Set(k, v)
 	}
-	if _, ok := config.Headers["Content-Type"]; !ok && body != nil {
+	if _, ok := opt.Headers["Content-Type"]; !ok && body != nil {
 		req.Header.Set("Content-Type", "application/json")
 	}
 
-	// 配置客户端
-	client := &http.Client{
-		Timeout: config.Timeout,
-	}
+	client := &http.Client{Timeout: opt.Timeout}
+	var resp *http.Response
 
-	// 发送请求
-	resp, err := client.Do(req)
+	// 重试逻辑
+	for i := 0; i <= opt.Retry; i++ {
+		resp, err = client.Do(req)
+		//记录日志
+
+		if err == nil && resp.StatusCode < 500 {
+			break
+		}
+		if i < opt.Retry {
+			time.Sleep(time.Second * time.Duration(i+1))
+		}
+	}
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
 
-	// 读取响应
-	respBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
+	return io.ReadAll(resp.Body)
+}
 
-	return &Response{
-		StatusCode: resp.StatusCode,
-		Body:       respBody,
-		Header:     resp.Header,
-	}, nil
+func Get(url string, opt *RequestOption) ([]byte, error) {
+	return Request(http.MethodGet, url, nil, opt)
+}
+
+func Post(url string, body interface{}, opt *RequestOption) ([]byte, error) {
+	return Request(http.MethodPost, url, body, opt)
 }

@@ -2,24 +2,14 @@ package db_services
 
 import (
 	"gorm.io/gorm"
+	"jing-sync/utils"
 )
-
-type PageInfo struct {
-	Page  int   `json:"page"`
-	Size  int   `json:"size"`
-	Total int64 `json:"total"`
-}
-
-type PageList[T any] struct {
-	List       []T      `json:"list"`
-	Pagination PageInfo `json:"pagination"`
-}
 
 type BaseService[T any] struct {
 	db *gorm.DB
 }
 
-func (bs *BaseService[T]) GetPageList(page, size int) (*PageList[T], error) {
+func (bs *BaseService[T]) GetPageList(page, size int) (*utils.PageList[T], error) {
 	var infos []T
 	offset := (page - 1) * size
 	r := bs.db.Where("status = 1").Offset(offset).Limit(size).Find(&infos)
@@ -28,9 +18,9 @@ func (bs *BaseService[T]) GetPageList(page, size int) (*PageList[T], error) {
 	var count int64
 	var m T
 	bs.db.Model(&m).Where("status = 1").Count(&count)
-	return &PageList[T]{
+	return &utils.PageList[T]{
 		List:       infos,
-		Pagination: PageInfo{Page: page, Size: size, Total: count},
+		Pagination: utils.PageInfo{Page: page, Size: size, Total: count},
 	}, r.Error
 }
 
