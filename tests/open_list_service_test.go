@@ -3,8 +3,8 @@ package tests
 import (
 	"fmt"
 	"jing-sync/boot"
-	"jing-sync/services"
 	"jing-sync/config"
+	"jing-sync/services"
 	"os"
 	"path/filepath"
 	"strings"
@@ -44,5 +44,5 @@ func TestOpenListClientPost(t *testing.T) {
 
 	res, _ := ol.Post("/api/fs/list", data)
 
-	fmt.Println(res)
+	fmt.Println(string(res))
 }

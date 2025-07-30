@@ -5,6 +5,7 @@ import (
 	"jing-sync/services/db_services"
 	"jing-sync/utils"
 	"strings"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -39,7 +40,7 @@ func (c *OpenListClient) Post(api string, data interface{}) ([]byte, error) {
 		Headers: map[string]string{
 			"Authorization": token,
 		},
-		Timeout: 30,
+		Timeout: 30 * time.Second,
 	}
 	return utils.Post(url, data, ro)
 }
