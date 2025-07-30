@@ -11,13 +11,13 @@ import (
 	"gorm.io/gorm"
 )
 
-var DB *gorm.DB
+var db *gorm.DB
 
 func GetDB() *gorm.DB {
-	if DB == nil {
+	if db == nil {
 		InitDB()
 	}
-	return DB
+	return db
 }
 
 func InitDB() string {
@@ -28,10 +28,10 @@ func InitDB() string {
 
 	dbPath := fmt.Sprintf("data/%s", config.Cfg.DbName)
 	if !utils.FileExists(dbPath) {
-		DB, err = gorm.Open(sqlite.Open(dbPath), &gorm.Config{})
-		password = AutoMigrate(DB)
+		db, err = gorm.Open(sqlite.Open(dbPath), &gorm.Config{})
+		password = AutoMigrate(db)
 	} else {
-		DB, err = gorm.Open(sqlite.Open(dbPath), &gorm.Config{})
+		db, err = gorm.Open(sqlite.Open(dbPath), &gorm.Config{})
 	}
 	if err != nil {
 		panic(err)
@@ -40,8 +40,8 @@ func InitDB() string {
 	return password
 }
 
-func AutoMigrate(DB *gorm.DB) string {
-	DB.AutoMigrate(&models.User{}, &models.Engine{}, &models.Job{})
+func AutoMigrate(db *gorm.DB) string {
+	db.AutoMigrate(&models.User{}, &models.Engine{}, &models.Job{})
 	password, err := utils.SecureRandString(10)
 	if err != nil {
 		panic(err)
@@ -50,7 +50,7 @@ func AutoMigrate(DB *gorm.DB) string {
 	if err != nil {
 		panic(err)
 	}
-	DB.Create(&models.User{Username: "admin", Password: passwordHashStr})
+	db.Create(&models.User{Username: "admin", Password: passwordHashStr})
 
 	return password
 }

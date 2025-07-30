@@ -12,10 +12,10 @@ import (
 
 func main() {
 	// 初始化配置
-	config.InitConfig()
+	config.InitConfig(config.EnvTypeProd)
 	// 初始化日志
 	logger.LoggerInit()
-	defer logger.Log.Writer().Close()
+	defer logger.GetLogger().Writer().Close()
 
 	// 初始化数据库
 	password := boot.InitDB()
@@ -35,10 +35,10 @@ func main() {
 	r := boot.WebSet()
 
 	if password != "" {
-		logger.Log.Info(fmt.Sprintf("admin password:%s", password))
+		logger.GetLogger().Info(fmt.Sprintf("admin password:%s", password))
 	}
 
 	port := config.Cfg.Port
-	logger.Log.Info(fmt.Sprintf("^_^ Running at http://127.0.0.1:%d/", port))
+	logger.GetLogger().Info(fmt.Sprintf("^_^ Running at http://127.0.0.1:%d/", port))
 	r.Run(fmt.Sprintf(":%d", port))
 }

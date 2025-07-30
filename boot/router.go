@@ -17,7 +17,7 @@ func WebSet() *gin.Engine {
 
 	// 设置timeout中间件
 	config_timeout := config.Cfg.Timeout
-	logger.Log.Infof("web-site timeout: %d minutes", config_timeout)
+	logger.GetLogger().Infof("web-site timeout: %d minutes", config_timeout)
 	r.Use(middlewares.Timeout(time.Duration(config_timeout)*time.Second))
 	// 设置日志中间件
 	r.Use(middlewares.LoggerMiddleware())
@@ -28,9 +28,10 @@ func WebSet() *gin.Engine {
 		c.File("./frontend/dist/index.html")
 	})
 
-	userController := controllers.NewUserController(DB)
-	engineController := controllers.NewEngineController(DB)
-	jobController := controllers.NewJobController(DB)
+	db := GetDB()
+	userController := controllers.NewUserController(db)
+	engineController := controllers.NewEngineController(db)
+	jobController := controllers.NewJobController(db)
 	// 定义API路由
 	api := r.Group("/api")
 	{

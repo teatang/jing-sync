@@ -30,7 +30,7 @@ func LoggerMiddleware() gin.HandlerFunc {
 		var bodyMap map[string]interface{}
 		json.Unmarshal(bodyBytes, &bodyMap)
 
-		logger.Log.WithFields(logrus.Fields{
+		logger.GetLogger().WithFields(logrus.Fields{
 			"status":       c.Writer.Status(),
 			"method":       c.Request.Method,
 			"path":         c.Request.URL.Path,

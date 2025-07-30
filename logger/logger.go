@@ -5,25 +5,34 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+	"fmt"
 
 	"github.com/lestrrat-go/file-rotatelogs"
 	"github.com/sirupsen/logrus"
 )
 
-var Log *logrus.Logger
+var logger *logrus.Logger
+
+func GetLogger() *logrus.Logger {
+	if logger == nil {
+		LoggerInit()
+	}
+
+	return logger
+}
 
 // LoggerInit函数用于初始化日志记录器
 func LoggerInit() {
 	// 创建一个新的日志记录器
-	Log = logrus.New()
+	logger = logrus.New()
 
 	// 设置日志记录器的报告调用者信息
-	Log.SetReportCaller(true)
+	logger.SetReportCaller(true)
 	// 设置控制台日志级别为Info级别
-	Log.SetLevel(logrus.InfoLevel)
+	logger.SetLevel(logrus.InfoLevel)
 	// 控制台输出配置（文本格式）
-	Log.SetOutput(os.Stdout)
-	Log.SetFormatter(&logrus.TextFormatter{
+	logger.SetOutput(os.Stdout)
+	logger.SetFormatter(&logrus.TextFormatter{
 		// 设置时间戳格式
 		FullTimestamp: true,
 		// 强制使用颜色
@@ -36,7 +45,7 @@ func LoggerInit() {
 	// 文件输出配置（JSON格式+按天分割）
 	writer, _ := rotatelogs.New(
 		// 设置日志文件名格式
-		filepath.Join("data/logs", webName+"_%Y%m%d.json"),
+		filepath.Join("data/logs", fmt.Sprintf("%s_%%Y%%m%%d_%s.json", webName, config.Cfg.Env)),
 		// 设置软链接名
 		// rotatelogs.WithLinkName("data/logs/app.json"),
 		// 设置日志文件轮转时间
@@ -61,7 +70,7 @@ func LoggerInit() {
 	}
 
 	// 添加文件输出钩子
-	Log.AddHook(&fileHook{
+	logger.AddHook(&fileHook{
 		// 设置文件写入器
 		Writer: writer,
 		// 设置格式化器

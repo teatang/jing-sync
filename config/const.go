@@ -1,5 +1,14 @@
 package config
 
+type EnvType string
+
+const (
+	EnvTypeProd EnvType = "prod"
+	EnvTypeDev EnvType = "dev"
+	EnvTypeTest	EnvType = "test"
+	EnvTypeUnitTest EnvType = "unit_test"
+)
+
 // error type
 type ErrType uint32
 

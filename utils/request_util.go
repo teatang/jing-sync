@@ -20,8 +20,6 @@ func Request(method, url string, body interface{}, opt *RequestOption) ([]byte, 
 		opt = &RequestOption{Timeout: 30 * time.Second}
 	}
 
-	logger.Log.Infof("Request: method=%s, url=%s, body=%v, opt=%+v", method, url, body, opt)
-
 	var reader io.Reader
 	if body != nil {
 		switch v := body.(type) {
@@ -58,7 +56,7 @@ func Request(method, url string, body interface{}, opt *RequestOption) ([]byte, 
 	for i := 0; i <= opt.Retry; i++ {
 		resp, err = client.Do(req)
 		//记录日志
-
+		logger.GetLogger().Infof("Request: method=%s, url=%s, body=%v, opt=%+v, resp=%+v, err=%+v", method, url, body, opt, resp, err)
 		if err == nil && resp.StatusCode < 500 {
 			break
 		}

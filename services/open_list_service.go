@@ -1,10 +1,12 @@
 package services
 
 import (
-	"gorm.io/gorm"
 	"jing-sync/models"
 	"jing-sync/services/db_services"
 	"jing-sync/utils"
+	"strings"
+
+	"gorm.io/gorm"
 )
 
 func NewOpenListClient(id string, db *gorm.DB) *OpenListClient {
@@ -30,7 +32,7 @@ type OpenListClient struct {
 // }
 
 func (c *OpenListClient) Post(api string, data interface{}) ([]byte, error) {
-	url := c.Engine.Url + api
+	url := strings.Trim(c.Engine.Url, "/") + api
 	token := c.Engine.Token
 
 	ro := &utils.RequestOption{

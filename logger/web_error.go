@@ -21,5 +21,5 @@ func WebError(c *gin.Context, err_type config.ErrType) {
 		GetParams: c.Request.URL.RawQuery,
 		ErrMsg:    config.ErrTypeMsg[err_type],
 	}
-	Log.Error(e)
+	GetLogger().Error(e)
 }
