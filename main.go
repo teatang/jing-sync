@@ -5,6 +5,9 @@ import (
 	"jing-sync/boot"
 	"jing-sync/config"
 	"jing-sync/logger"
+
+	"github.com/robfig/cron/v3"
+	"time"
 )
 
 func main() {
@@ -16,6 +19,17 @@ func main() {
 
 	// 初始化数据库
 	password := boot.InitDB()
+
+	c := cron.New()
+	i := 1
+	EntryID, err := c.AddFunc("*/1 * * * *", func() {
+		fmt.Println(time.Now(), "每分钟执行一次", i)
+		i++
+	})
+	fmt.Println(time.Now(), EntryID, err)
+
+	c.Start()
+	defer c.Stop()
 
 	// web设置
 	r := boot.WebSet()
