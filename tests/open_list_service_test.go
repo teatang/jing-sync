@@ -18,7 +18,7 @@ func init() {
 	// 获取当前工作目录
 	rootDir, err := os.Getwd()
 	if err != nil {
-		fmt.Printf("Failed to get current working directory: %s", err)
+		panic(err)
 	}
 
 	// 这是单元测试
@@ -28,21 +28,19 @@ func init() {
 
 	// 设置工作目录
 	if err := os.Chdir(rootDir); err != nil {
-		fmt.Printf("Failed to change working directory: %s", err)
+		panic(err)
 	}
 	fmt.Println("工作目录：", rootDir)
 }
 
-func TestOpenListClientPost(t *testing.T) {
-	ol := services.NewOpenListClient("1", boot.GetDB())
-	data := map[string]interface{}{
-		"path":     "/",
-		"refresh":  true,
-		"page":     1,
-		"per_page": 100,
-	}
-
-	res, _ := ol.Post("/api/fs/list", data)
-
+func TestGetChildPathRaw(t *testing.T) {
+	c := services.NewOpenListClient("1", boot.GetDB())
+	res, _ := c.GetChildPathRaw("/", 0)
 	fmt.Println(string(res))
+}
+
+func TestGetChildPath(t *testing.T) {
+	c := services.NewOpenListClient("1", boot.GetDB())
+	res, _ := c.GetChildPath("/", 0)
+	fmt.Println(res)
 }
