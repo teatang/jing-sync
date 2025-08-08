@@ -1,10 +1,10 @@
 package boot
 
 import (
-	"jing-sync/controllers"
-	"jing-sync/middlewares"
 	"jing-sync/config"
+	"jing-sync/controllers"
 	"jing-sync/logger"
+	"jing-sync/middlewares"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -18,10 +18,9 @@ func WebSet() *gin.Engine {
 	// 设置timeout中间件
 	config_timeout := config.Cfg.Timeout
 	logger.GetLogger().Infof("web-site timeout: %d minutes", config_timeout)
-	r.Use(middlewares.Timeout(time.Duration(config_timeout)*time.Second))
+	r.Use(middlewares.Timeout(time.Duration(config_timeout) * time.Second))
 	// 设置日志中间件
 	r.Use(middlewares.LoggerMiddleware())
-	
 
 	// 网站首页
 	r.GET("/", func(c *gin.Context) {
@@ -32,6 +31,8 @@ func WebSet() *gin.Engine {
 	userController := controllers.NewUserController(db)
 	engineController := controllers.NewEngineController(db)
 	jobController := controllers.NewJobController(db)
+	openListController := controllers.NewOpenListController(db)
+
 	// 定义API路由
 	api := r.Group("/api")
 	{
@@ -52,6 +53,8 @@ func WebSet() *gin.Engine {
 		api.GET("/job/:id", jobController.GetJob)
 		api.PUT("/job", jobController.UpdateJob)
 		api.DELETE("/job", jobController.DeleteJob)
+
+		api.GET("/open-list", openListController.GetPageOpenList)
 	}
 
 	return r

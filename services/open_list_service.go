@@ -12,18 +12,16 @@ import (
 	"gorm.io/gorm"
 )
 
-func NewOpenListClient(id string, db *gorm.DB) *OpenListClient {
-	es := db_services.NewEngineService(db)
-	engine, _ := es.GetByID(id)
-	return &OpenListClient{
-		Engine: engine,
-		db:     db,
-	}
+type OpenListService struct {
+    db *gorm.DB
 }
 
-type OpenListClient struct {
-	Engine *models.Engine
-	db     *gorm.DB
+func NewOpenListService(db *gorm.DB) *OpenListService {
+	return &OpenListService{db: db}
+}
+
+func (s *OpenListService)GetOpenListInfo(engine_id string, path string) (*utils.PageList[string], error) {
+	return NewOpenListClient(engine_id, s.db).GetChildPath(path, 0)
 }
 
 type ChildPathRawInfo struct {
@@ -40,6 +38,20 @@ type ChildPathRawResponse struct {
 	Data    struct {
 		Content []ChildPathRawInfo `json:"content"`
 	} `json:"data"`
+}
+
+func NewOpenListClient(id string, db *gorm.DB) *OpenListClient {
+	es := db_services.NewEngineService(db)
+	engine, _ := es.GetByID(id)
+	return &OpenListClient{
+		Engine: engine,
+		db:     db,
+	}
+}
+
+type OpenListClient struct {
+	Engine *models.Engine
+	db     *gorm.DB
 }
 
 func (c *OpenListClient) GetChildPath(path string, speed int) (*utils.PageList[string], error) {
