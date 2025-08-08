@@ -2,10 +2,10 @@ package services
 
 import (
 	"encoding/json"
-	"fmt"
 	"jing-sync/models"
 	"jing-sync/services/db_services"
 	"jing-sync/utils"
+
 	"strings"
 	"time"
 
@@ -26,16 +26,30 @@ type OpenListClient struct {
 	db     *gorm.DB
 }
 
+type ChildPathRawInfo struct {
+	Name     string `json:"name"`
+	IsDir    bool   `json:"is_dir"`
+	Created  string `json:"created"`
+	Modified string `json:"modified"`
+}
+
+type ChildPathRawResponse struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	Total   int64  `json:"total"`
+	Data    struct {
+		Content []ChildPathRawInfo `json:"content"`
+	} `json:"data"`
+}
+
 func (c *OpenListClient) GetChildPath(path string, speed int) (*utils.PageList[string], error) {
 	res, err := c.GetChildPathRaw(path, speed)
 	if err != nil {
 		return nil, err
 	}
 
-	// 定义一个map来接收解析后的数据
-	var r map[string]interface{}
-
-	// 解析JSON字符串到map中
+	var r ChildPathRawResponse
+	// 解析JSON字符串到ChildPathRawResponse中
 	e := json.Unmarshal(res, &r)
 	if e != nil {
 		return nil, e
@@ -44,12 +58,24 @@ func (c *OpenListClient) GetChildPath(path string, speed int) (*utils.PageList[s
 	return c.GetChildPathFormat(r)
 }
 
-func (c *OpenListClient) GetChildPathFormat(open_list_data map[string]interface{}) (*utils.PageList[string], error) {
-	data := open_list_data["data"].(map[string]interface{})
-	content_list := data["content"].([]interface{})
-	fmt.Println(content_list)
+func (c *OpenListClient) GetChildPathFormat(open_list_data ChildPathRawResponse) (*utils.PageList[string], error) {
+	var path_list []string
+	for _, c := range open_list_data.Data.Content {
+		if !c.IsDir {
+			continue
+		}
 
-	return nil, nil
+		path_list = append(path_list, c.Name)
+	}
+
+	return &utils.PageList[string]{
+		List: path_list,
+		Pagination: utils.PageInfo{
+			Page:  1,
+			Size:  100,
+			Total: open_list_data.Total,
+		},
+	}, nil
 }
 
 func (c *OpenListClient) GetChildPathRaw(path string, speed int) ([]byte, error) {
