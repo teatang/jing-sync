@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
-import type { IConfig, Engine, InfoList, Pagination } from "@/types";
+import type { IConfig, Engine, InfoList, Pagination, LoginInfo } from "@/types";
+import { setToken } from "@/utils/token";
 import RestClient from "@/utils/rest-client";
 
 export const useMainStore = defineStore<string, IConfig>("main", {
@@ -41,3 +42,26 @@ export const useAllEngineListStore = defineStore<string, InfoList<Engine>, {}, A
     },
   }
 );
+
+interface UserActions {
+  login: (loginForm: { username: string; password: string }) => Promise<void>;
+}
+
+export const useUserStore = defineStore<string, LoginInfo, {}, UserActions>('user', {
+  state: () => ({
+    token: '',
+    expire_at: ''
+  }),
+  
+  actions: {
+    async login(loginForm: { username: string; password: string }) {
+      try {
+        const res = await new RestClient().post<LoginInfo>("/login", loginForm)
+        this.token = res.token
+        setToken(res.token)
+      } catch (error) {
+        return Promise.reject(error)
+      }
+    }
+  }
+})

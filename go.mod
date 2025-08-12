@@ -6,6 +6,7 @@ toolchain go1.24.4
 
 require (
 	github.com/gin-gonic/gin v1.10.1
+	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/sirupsen/logrus v1.9.3

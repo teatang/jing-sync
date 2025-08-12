@@ -28,11 +28,13 @@ func WebSet() *gin.Engine {
 	})
 
 	db := GetDB()
+	indexController := controllers.NewIndexController(db)
 	userController := controllers.NewUserController(db)
 	engineController := controllers.NewEngineController(db)
 	jobController := controllers.NewJobController(db)
 	openListController := controllers.NewOpenListController(db)
 
+	r.POST("/api/login", indexController.Login)
 	// 定义API路由
 	api := r.Group("/api")
 	{

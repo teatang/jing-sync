@@ -28,6 +28,6 @@ func ResponseError(c *gin.Context, code int, message string) {
 	c.JSON(http.StatusOK, gin.H{
 		"success": false,
 		"code":    code,
-		"message": message,
+		"msg": message,
 	})
 }

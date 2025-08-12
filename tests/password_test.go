@@ -1,7 +1,11 @@
 package tests
 
 import (
+	"fmt"
+	"jing-sync/boot"
+	"jing-sync/services/db_services"
 	"jing-sync/utils"
+
 	"testing"
 	"unicode/utf8"
 )
@@ -65,4 +69,13 @@ func isValidRune(r rune) bool {
 	return (r >= 'a' && r <= 'z') ||
 		(r >= 'A' && r <= 'Z') ||
 		(r >= '0' && r <= '9')
+}
+
+func TestGetUserByUsernamePassword(t *testing.T) {
+	db := boot.GetDB()
+    us := db_services.NewUserService(db)
+
+	user, _ := us.GetUserByUsernamePassword("admin", "78rzLF8uXg")
+
+	fmt.Println(user)
 }

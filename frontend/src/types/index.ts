@@ -54,6 +54,11 @@ export interface Job {
   update_time?: string;
 }
 
+export interface LoginInfo {
+  token: string;
+  expire_at: string;
+}
+
 export interface InfoList<T> {
   list: T[];
   pagination: Pagination;

@@ -30,7 +30,7 @@ class RestClient {
       const ret = (await response.json()) as JsonReturn<T>;
 
       if (!ret.success) {
-        throw new Error(`API error! msg: ${ret.msg}`);
+        throw new Error(`${ret.msg}`);
       }
 
       return ret.data as T;
