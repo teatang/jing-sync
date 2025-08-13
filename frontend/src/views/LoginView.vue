@@ -76,7 +76,7 @@ const handleLogin = async () => {
     await loginFormRef.value.validate()
     loading.value = true
     await userStore.login(loginForm.value)
-    router.push('/')
+    window.location.reload()
   } catch (error) {
     ElMessage.error(`${error}`)
   } finally {
