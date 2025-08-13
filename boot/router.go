@@ -34,9 +34,12 @@ func WebSet() *gin.Engine {
 	jobController := controllers.NewJobController(db)
 	openListController := controllers.NewOpenListController(db)
 
+	// 登陆路由
 	r.POST("/api/login", indexController.Login)
-	// 定义API路由
+
+	// 受保护路由组
 	api := r.Group("/api")
+	api.Use(middlewares.AuthMiddleware())
 	{
 		api.POST("/user", userController.CreateUser)
 		api.GET("/user", userController.GetPageUsers)

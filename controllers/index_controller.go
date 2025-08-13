@@ -12,12 +12,6 @@ import (
 	"time"
 )
 
-// JWT声明结构
-type Claims struct {
-	Username string `json:"username"`
-	jwt.RegisteredClaims
-}
-
 type IndexController struct {
 	BaseController
 	userService *db_services.UserService
@@ -51,8 +45,9 @@ func (uc *IndexController) Login(c *gin.Context) {
 	// 创建Token声明
 	expirationTime := time.Now().Add(7 * 24 * time.Hour)
 
-	claims := &Claims{
+	claims := &utils.Claims{
 		Username: user.Username,
+		UserId: user.ID,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expirationTime),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),

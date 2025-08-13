@@ -6,7 +6,15 @@ import (
 	"encoding/hex"
 	"math/big"
 	"os"
+	"github.com/golang-jwt/jwt/v5"
 )
+
+// JWT声明结构
+type Claims struct {
+	Username string `json:"username"`
+	UserId uint `json:"user_id"`
+	jwt.RegisteredClaims
+}
 
 func Password2hash(password string) (string, error) {
 	sk, err := GetSecretKey()
