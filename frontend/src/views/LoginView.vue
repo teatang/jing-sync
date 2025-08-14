@@ -48,7 +48,6 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/index'
 import { ElMessage } from 'element-plus'
 
@@ -68,7 +67,6 @@ const loginRules = {
 
 const loginFormRef = ref()
 const loading = ref(false)
-const router = useRouter()
 const userStore = useUserStore()
 
 const handleLogin = async () => {
