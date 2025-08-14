@@ -90,8 +90,7 @@ const handleSubmit = async () => {
     emit("success");
     visible.value = false;
   } catch (e) {
-    console.error(e);
-    ElMessage.error(`操作失败 msg: ${e}`);
+    ElMessage.error(`${e}`);
   }
 };
 </script>

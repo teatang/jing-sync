@@ -81,7 +81,7 @@ const fetchUsers = async () => {
     users.value = infoList.list as User[];
     pagination.value = infoList.pagination as Pagination;
   } catch (error) {
-    console.error("获取engines失败:", error);
+    ElMessage.error(`${error}`);
   }
 };
 
@@ -106,8 +106,7 @@ const handleDelete = async (user: User) => {
     ElMessage.success("删除成功");
     fetchUsers();
   } catch (error) {
-    console.error("delete engine 失败:", error);
-    ElMessage.error(`取消删除`);
+    ElMessage.error(`${error}`);
   }
 };
 

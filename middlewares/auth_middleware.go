@@ -3,6 +3,7 @@ package middlewares
 import (
 	"jing-sync/utils"
 	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -20,11 +21,11 @@ func AuthMiddleware() gin.HandlerFunc {
 		claims := &utils.Claims{}
 		jwtSecret, _ := utils.GetSecretKey()
 		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-			return jwtSecret, nil
+			return []byte(jwtSecret), nil
 		})
 
 		if err != nil || !token.Valid {
-			utils.ResponseError(c, http.StatusUnauthorized, "无效Token")
+			utils.ResponseError(c, http.StatusUnauthorized, "Token验证失败 " + err.Error())
 			c.Abort()
 			return
 		}

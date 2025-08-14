@@ -87,7 +87,7 @@ const fetchEngines = async () => {
     engines.value = infoList.list as Engine[];
     pagination.value = infoList.pagination as Pagination;
   } catch (error) {
-    console.error("获取engines失败:", error);
+    ElMessage.error(`${error}`);
   }
 };
 
@@ -112,8 +112,7 @@ const handleDelete = async (engine: Engine) => {
     ElMessage.success("删除成功");
     fetchEngines();
   } catch (error) {
-    console.error("delete engine 失败:", error);
-    ElMessage.error(`取消删除`);
+    ElMessage.error(`${error}`);
   }
 };
 

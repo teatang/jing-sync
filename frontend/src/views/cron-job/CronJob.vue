@@ -151,7 +151,7 @@ const fetchJobs = async () => {
     jobs.value = infoList.list as Job[];
     pagination.value = infoList.pagination as Pagination;
   } catch (error) {
-    console.error("获取engines失败:", error);
+    ElMessage.error(`${error}`);
   }
 };
 
@@ -176,8 +176,7 @@ const handleDelete = async (job: Job) => {
     ElMessage.success("删除成功");
     fetchJobs();
   } catch (error) {
-    console.error("delete engine 失败:", error);
-    ElMessage.error(`取消删除`);
+    ElMessage.error(`${error}`);
   }
 };
 

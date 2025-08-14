@@ -64,10 +64,3 @@ func WebSet() *gin.Engine {
 
 	return r
 }
-
-func timeoutResponse(c *gin.Context) {
-	c.JSON(504, gin.H{
-		"code": 504,
-		"msg":  "请求处理超时",
-	})
-}

@@ -290,7 +290,6 @@ const fetchPaths = async (
     );
     return infoList.list as string[];
   } catch (error) {
-    console.error("获取engines失败:", error);
     return [];
   }
 };
@@ -354,8 +353,7 @@ const handleSubmit = async () => {
     emit("success");
     visible.value = false;
   } catch (e) {
-    console.error(e);
-    ElMessage.error(`操作失败 msg: ${e}`);
+    ElMessage.error(`${e}`);
   }
 };
 </script>

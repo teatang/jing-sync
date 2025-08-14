@@ -1,5 +1,6 @@
 import type { RequestOptions, JsonReturn } from "@/types";
 import { useMainStore } from "@/stores";
+import { getToken } from "@/utils/token";
 
 class RestClient {
   private baseUrl: string;
@@ -79,6 +80,7 @@ class RestClient {
   private getHeaders(customHeaders?: Record<string, string>): Headers {
     const headers = new Headers({
       "Content-Type": "application/json",
+      "Authorization": getToken(),
       ...customHeaders,
     });
     return headers;
