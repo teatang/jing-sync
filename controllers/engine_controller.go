@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"jing-sync/models"
+	"jing-sync/utils"
 	"jing-sync/services/db_services"
 	"net/http"
 	"strconv"
@@ -27,6 +28,7 @@ func (ec *EngineController) CreateEngine(c *gin.Context) {
 		ec.Error(c, http.StatusBadRequest, err.Error())
 		return
 	}
+	engine.UserId = utils.GetTokenUserId(c)
 
 	if err := ec.engineService.Create(&engine); err != nil {
 		ec.Error(c, http.StatusInternalServerError, err.Error())

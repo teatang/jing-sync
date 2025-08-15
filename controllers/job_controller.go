@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"jing-sync/models"
+	"jing-sync/utils"
 	"jing-sync/services/db_services"
 	"net/http"
 	"strconv"
@@ -27,6 +28,7 @@ func (uc *JobController) CreateJob(c *gin.Context) {
 		uc.Error(c, http.StatusBadRequest, err.Error())
 		return
 	}
+	job.UserId = utils.GetTokenUserId(c)
 
 	if err := uc.jobService.Create(&job); err != nil {
 		uc.Error(c, http.StatusInternalServerError, err.Error())

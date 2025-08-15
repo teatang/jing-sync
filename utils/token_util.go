@@ -6,13 +6,15 @@ import (
 	"encoding/hex"
 	"math/big"
 	"os"
+
+	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 )
 
 // JWT声明结构
 type Claims struct {
 	Username string `json:"username"`
-	UserId uint `json:"user_id"`
+	UserId   uint   `json:"user_id"`
 	jwt.RegisteredClaims
 }
 
@@ -72,4 +74,14 @@ func ReadOrSet(fileName string, defaultValue string, force bool) (string, error)
 func SHA256(text string) string {
 	hash := sha256.Sum256([]byte(text))
 	return hex.EncodeToString(hash[:])
+}
+
+func GetTokenUserId(c *gin.Context) uint {
+	claims, exist := c.Get("claims")
+	if !exist {
+		panic("claims 不存在")
+	}
+	claimsInfo := claims.(*Claims)
+
+	return claimsInfo.UserId
 }
