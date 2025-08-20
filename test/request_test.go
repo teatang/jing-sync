@@ -1,8 +1,9 @@
 package test
 
 import (
+	"jing-sync/internal/utils"
+
 	"encoding/json"
-	"jing-sync/utils"
 	"net/http"
 	"net/http/httptest"
 	"testing"
