@@ -42,6 +42,9 @@ importers:
       vite:
         specifier: ^6.3.5
         version: 6.3.5(@types/node@24.0.10)(sass-embedded@1.90.0)(sass@1.90.0)
+      vue-i18n:
+        specifier: '9'
+        version: 9.14.5(vue@3.5.16(typescript@5.8.3))
       vue-tsc:
         specifier: ^2.2.8
         version: 2.2.10(typescript@5.8.3)
@@ -235,6 +238,18 @@ packages:
 
   '@floating-ui/utils@0.2.9':
     resolution: {integrity: sha512-MDWhGtE+eHw5JW7lq4qhc5yRLS11ERl1c7Z6Xd0a58DozHES6EnNNwUWbMiG4J9Cgj053Bhk8zvlhFYKVhULwg==}
+
+  '@intlify/core-base@9.14.5':
+    resolution: {integrity: sha512-5ah5FqZG4pOoHjkvs8mjtv+gPKYU0zCISaYNjBNNqYiaITxW8ZtVih3GS/oTOqN8d9/mDLyrjD46GBApNxmlsA==}
+    engines: {node: '>= 16'}
+
+  '@intlify/message-compiler@9.14.5':
+    resolution: {integrity: sha512-IHzgEu61/YIpQV5Pc3aRWScDcnFKWvQA9kigcINcCBXN8mbW+vk9SK+lDxA6STzKQsVJxUPg9ACC52pKKo3SVQ==}
+    engines: {node: '>= 16'}
+
+  '@intlify/shared@9.14.5':
+    resolution: {integrity: sha512-9gB+E53BYuAEMhbCAxVgG38EZrk59sxBtv3jSizNL2hEWlgjBjAw1AwpLHtNaeda12pe6W20OGEa0TwuMSRbyQ==}
+    engines: {node: '>= 16'}
 
   '@jridgewell/sourcemap-codec@1.5.0':
     resolution: {integrity: sha512-gv3ZRaISU3fjPAgNsriBRqGWQL6quFx04YMPW/zD8XMLsU32mhCCbfbO6KZFLjvYpCZ8zyDEgqsgf+PwPaM7GQ==}
@@ -969,6 +984,12 @@ packages:
       '@vue/composition-api':
         optional: true
 
+  vue-i18n@9.14.5:
+    resolution: {integrity: sha512-0jQ9Em3ymWngyiIkj0+c/k7WgaPO+TNzjKSNq9BvBQaKJECqn9cd9fL4tkDhB5G1QBskGl9YxxbDAhgbFtpe2g==}
+    engines: {node: '>= 16'}
+    peerDependencies:
+      vue: ^3.0.0
+
   vue-router@4.5.1:
     resolution: {integrity: sha512-ogAF3P97NPm8fJsE4by9dwSYtDwXIY1nFY9T6DyQnGHd1E2Da94w9JIolpe42LJGIl0DwOHBi8TcRPlPGwbTtw==}
     peerDependencies:
@@ -1096,6 +1117,18 @@ snapshots:
       '@floating-ui/utils': 0.2.9
 
   '@floating-ui/utils@0.2.9': {}
+
+  '@intlify/core-base@9.14.5':
+    dependencies:
+      '@intlify/message-compiler': 9.14.5
+      '@intlify/shared': 9.14.5
+
+  '@intlify/message-compiler@9.14.5':
+    dependencies:
+      '@intlify/shared': 9.14.5
+      source-map-js: 1.2.1
+
+  '@intlify/shared@9.14.5': {}
 
   '@jridgewell/sourcemap-codec@1.5.0': {}
 
@@ -1743,6 +1776,13 @@ snapshots:
 
   vue-demi@0.14.10(vue@3.5.16(typescript@5.8.3)):
     dependencies:
+      vue: 3.5.16(typescript@5.8.3)
+
+  vue-i18n@9.14.5(vue@3.5.16(typescript@5.8.3)):
+    dependencies:
+      '@intlify/core-base': 9.14.5
+      '@intlify/shared': 9.14.5
+      '@vue/devtools-api': 6.6.4
       vue: 3.5.16(typescript@5.8.3)
 
   vue-router@4.5.1(vue@3.5.16(typescript@5.8.3)):

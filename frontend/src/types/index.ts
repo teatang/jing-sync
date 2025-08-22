@@ -2,6 +2,9 @@ export interface IConfig {
   loading: boolean;
 }
 
+export const langs = ['zh-CN', 'en'] as const
+export type Language = typeof langs[number]
+
 export type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 
 export interface RequestOptions {

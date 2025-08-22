@@ -5,9 +5,9 @@
     </div>
 
     <el-table :data="users" style="width: 100%">
-      <el-table-column prop="username" label="用户名" />1
-      <el-table-column prop="password" label="密码" />
-      <el-table-column label="创建时间">
+      <el-table-column prop="username" :label="t('page.user.username')" />1
+      <el-table-column prop="password" :label="t('page.user.password')" />
+      <el-table-column :label="t('page.create_time')">
         <template #default="scope">
           {{
             scope.row.create_time
@@ -16,7 +16,7 @@
           }}
         </template>
       </el-table-column>
-      <el-table-column label="更新时间">
+      <el-table-column :label="t('page.update_time')">
         <template #default="scope">
           {{
             scope.row.update_time
@@ -25,17 +25,17 @@
           }}
         </template>
       </el-table-column>
-      <el-table-column fixed="right" label="操作" min-width="100">
+      <el-table-column fixed="right" :label="t('page.handle')" min-width="100">
         <template #default="scope">
           <el-button size="small" @click="handleEdit(scope.row)">
-            Edit
+            {{ t('page.handle_edit') }}
           </el-button>
           <el-button
             size="small"
             type="danger"
             @click="handleDelete(scope.row)"
           >
-            Delete
+            {{ t('page.handle_delete') }}
           </el-button>
         </template>
       </el-table-column>
@@ -66,7 +66,9 @@ import RestClient from "@/utils/rest-client";
 import type { User, Pagination, InfoList } from "@/types/index";
 import UserSettingDialog from "@/views/setting/UserSettingDialog.vue";
 import { ElMessage, ElMessageBox } from "element-plus";
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const users = ref<User[]>([]);
 const currentUser = ref<Partial<User>>({});
 const dialogVisible = ref(false);
@@ -99,11 +101,11 @@ const handleEdit = (user: User) => {
 
 const handleDelete = async (user: User) => {
   try {
-    await ElMessageBox.confirm("确认删除该数据吗？", "提示", {
+    await ElMessageBox.confirm(t("msg.delete_confirm_msg",), t("msg.delete_confirm_msg_title"), {
       type: "warning",
     });
     await new RestClient().delete<User[]>("/user", user);
-    ElMessage.success("删除成功");
+    ElMessage.success(t("msg.delete_confirm_msg_success"));
     fetchUsers();
   } catch (error) {
     ElMessage.error(`${error}`);

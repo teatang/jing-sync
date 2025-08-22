@@ -31,7 +31,20 @@
           </el-button>
         </div>
         <div class="header-toolbar-right">
-          <el-dropdown>
+          <el-dropdown class="header-toolbar-right-item">
+            <el-button>
+              <el-icon>
+                <Comment />
+              </el-icon>
+              <span>切换语言</span>
+            </el-button>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item v-for="lang in langs" @click="localeStore.setLanguage(lang)" :key="lang">{{ lang }}</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+          <el-dropdown class="header-toolbar-right-item">
             <el-button>
               <el-icon>
                 <setting />
@@ -58,10 +71,13 @@
 
 <script lang="ts" setup>
 import { useMainStore } from "@/stores";
+import { useLocaleStore } from "@/stores/localeStore";
 import { ref } from "vue";
+import {langs} from "@/types/index"
 
 const mainStore = useMainStore();
 const isCollapse = ref<boolean>(false);
+const localeStore = useLocaleStore();
 </script>
 
 <style scoped>
@@ -88,5 +104,9 @@ const isCollapse = ref<boolean>(false);
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.header-toolbar-right-item {
+  margin-left: 10px;
 }
 </style>
