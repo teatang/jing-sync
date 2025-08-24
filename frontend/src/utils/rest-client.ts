@@ -1,6 +1,7 @@
 import type { RequestOptions, JsonReturn } from "@/types";
 import { useMainStore } from "@/stores";
 import { getToken } from "@/utils/token";
+import { useLocaleStore } from "@/stores/localeStore";
 
 class RestClient {
   private baseUrl: string;
@@ -81,6 +82,7 @@ class RestClient {
     const headers = new Headers({
       "Content-Type": "application/json",
       "Authorization": getToken(),
+      "Language": useLocaleStore().getLanguage(),
       ...customHeaders,
     });
     return headers;
@@ -90,7 +92,6 @@ class RestClient {
     endpoint: string,
     params?: Record<string, string | number | boolean>
   ): Promise<T> {
-    console.log(endpoint, params)
     return this.request<T>(endpoint, { method: "GET", params });
   }
 

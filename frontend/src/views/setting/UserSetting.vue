@@ -101,7 +101,7 @@ const handleEdit = (user: User) => {
 
 const handleDelete = async (user: User) => {
   try {
-    await ElMessageBox.confirm(t("msg.delete_confirm_msg",), t("msg.delete_confirm_msg_title"), {
+    await ElMessageBox.confirm(t("msg.delete_confirm_msg"), t("msg.delete_confirm_msg_title"), {
       type: "warning",
     });
     await new RestClient().delete<User[]>("/user", user);
