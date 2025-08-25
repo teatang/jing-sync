@@ -19,6 +19,6 @@ func GetI18nBundle() *i18n.Bundle {
 func InitI18n() {
 	i18nBundle = i18n.NewBundle(language.Chinese)
 	i18nBundle.RegisterUnmarshalFunc("toml", toml.Unmarshal)
-	i18nBundle.MustLoadMessageFile("locales/active.en.toml")
-	i18nBundle.MustLoadMessageFile("locales/active.zh-CN.toml")
+	i18nBundle.MustLoadMessageFile("internal/locales/active.en.toml")
+	i18nBundle.MustLoadMessageFile("internal/locales/active.zh-CN.toml")
 }
