@@ -5,11 +5,12 @@ import (
 	"jing-sync/internal/services/db_services"
 	"jing-sync/internal/utils"
 
+	"net/http"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"gorm.io/gorm"
-	"net/http"
-	"time"
 )
 
 type IndexController struct {
@@ -38,7 +39,7 @@ func (uc *IndexController) Login(c *gin.Context) {
 
 	user, err := uc.userService.GetUserByUsernamePassword(postUser.Username, postUser.Password)
 	if err != nil {
-		uc.Error(c, http.StatusInternalServerError, "用户名或者密码错误")
+		uc.Error(c, http.StatusInternalServerError, utils.GetI18nMsg("error_msg.username_password_incorrect", c))
 		return
 	}
 

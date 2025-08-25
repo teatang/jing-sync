@@ -81,8 +81,8 @@ class RestClient {
   private getHeaders(customHeaders?: Record<string, string>): Headers {
     const headers = new Headers({
       "Content-Type": "application/json",
-      "Authorization": getToken(),
-      "Language": useLocaleStore().getLanguage(),
+      Authorization: getToken(),
+      "Accept-Language": useLocaleStore().getLanguage(),
       ...customHeaders,
     });
     return headers;

@@ -3,6 +3,7 @@ package middlewares
 import (
 	"jing-sync/internal/utils"
 
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"net/http"
@@ -25,7 +26,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		})
 
 		if err != nil || !token.Valid {
-			utils.ResponseError(c, http.StatusUnauthorized, "Token验证失败 "+err.Error())
+			utils.ResponseError(c, http.StatusUnauthorized, fmt.Sprintf("%s, %s", utils.GetI18nMsg("error_msg.token_check_failed", c), err.Error()))
 			c.Abort()
 			return
 		}

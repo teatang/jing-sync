@@ -15,6 +15,8 @@ func WebSet() *gin.Engine {
 	// 设置静态文件目录
 	r.Static("/assets", "./frontend/dist/assets")
 
+	// 设置i18n中间件
+	r.Use(middlewares.I18nMiddleware())
 	// 设置timeout中间件
 	config_timeout := config.Cfg.Timeout
 	logger.GetLogger().Infof("web-site timeout: %d minutes", config_timeout)
