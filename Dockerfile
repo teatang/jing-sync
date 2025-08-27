@@ -11,7 +11,8 @@ FROM golang:1.24-alpine as backend-builder
 WORKDIR /go/src/app
 COPY . .
 RUN apk add --no-cache gcc musl-dev # SQLite编译依赖
-RUN go mod download
+RUN go env -w GOPROXY=https://goproxy.cn,direct && \
+    go mod download
 RUN CGO_ENABLED=1 GOOS=linux go build -ldflags="-extldflags=-static" -o /go/bin/app ./cmd/web
 
 # 第三阶段：生成最终镜像
