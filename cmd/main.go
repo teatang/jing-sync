@@ -5,7 +5,7 @@ import (
 	"jing-sync/boot/app"
 	"jing-sync/boot/config"
 	"jing-sync/boot/database"
-	"jing-sync/boot/i18n"
+	_ "jing-sync/boot/i18n"
 	"jing-sync/boot/logger"
 
 	"github.com/robfig/cron/v3"
@@ -15,12 +15,9 @@ import (
 func main() {
 	// 初始化配置
 	config.InitConfig(config.EnvTypeProd)
-	// 初始化国际化
-	i18n.InitI18n()
 	// 初始化日志
 	logger.LoggerInit()
 	defer logger.GetLogger().Writer().Close()
-
 	// 初始化数据库
 	password := database.InitDB()
 
