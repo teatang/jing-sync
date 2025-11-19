@@ -17,7 +17,7 @@ func NewOpenListController(db *gorm.DB) *OpenListController {
 	return &OpenListController{openListService: services.NewOpenListService(db)}
 }
 
-// GetPageJobs 分页获取用户列表
+// GetPageJobs 分页获取open列表
 func (olc *OpenListController) GetPageOpenList(c *gin.Context) {
 	engine_id := c.Query("engine_id")
 	path := c.DefaultQuery("path", "/")

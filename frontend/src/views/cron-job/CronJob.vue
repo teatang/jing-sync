@@ -1,13 +1,13 @@
 <template>
-  <div class="t-management">
-    <div class="t-management-header">
+  <div class="p-[10px]">
+    <div class="mb-[10px]">
       <el-button type="primary" @click="handleAdd">新增任务</el-button>
     </div>
 
     <el-table :data="jobs" style="width: 100%">
       <el-table-column type="expand">
         <template #default="props">
-          <el-row class="t-row">
+          <el-row class="p-[12px]">
             <el-col :span="4"
               >method:
               {{
@@ -26,22 +26,71 @@
                 getSelectOptionName(props.row.is_cron, JOB_IS_CRON_CONFIGS)
               }}</el-col
             >
-            <el-col :span="4">year: {{ props.row.year ? props.row.year : "-" }}</el-col>
-            <el-col :span="4">month: {{ props.row.month ? props.row.month : "-" }}</el-col>
-            <el-col :span="4">day: {{ props.row.day ? props.row.day : "-" }}</el-col>
+            <el-col :span="4"
+              >year: {{ props.row.year ? props.row.year : "-" }}</el-col
+            >
+            <el-col :span="4"
+              >month: {{ props.row.month ? props.row.month : "-" }}</el-col
+            >
+            <el-col :span="4"
+              >day: {{ props.row.day ? props.row.day : "-" }}</el-col
+            >
           </el-row>
-          <el-row class="t-row">
-            <el-col :span="4">hour: {{ props.row.hour ? props.row.hour : "-" }}</el-col>
-            <el-col :span="4">minute: {{ props.row.minute ? props.row.minute : "-" }}</el-col>
-            <el-col :span="4">second: {{ props.row.second ? props.row.second : "-" }}</el-col>
-            <el-col :span="4">week: {{ props.row.week ? props.row.week : "-" }}</el-col>
-            <el-col :span="4">day_of_week: {{ props.row.day_of_week ? props.row.day_of_week : "-" }}</el-col>
-            <el-col :span="4">start_date: {{ props.row.start_date ? new Date(props.row.start_date).toLocaleString().substring(0, 10) : "-" }}</el-col>
+          <el-row class="p-[12px]">
+            <el-col :span="4"
+              >hour: {{ props.row.hour ? props.row.hour : "-" }}</el-col
+            >
+            <el-col :span="4"
+              >minute: {{ props.row.minute ? props.row.minute : "-" }}</el-col
+            >
+            <el-col :span="4"
+              >second: {{ props.row.second ? props.row.second : "-" }}</el-col
+            >
+            <el-col :span="4"
+              >week: {{ props.row.week ? props.row.week : "-" }}</el-col
+            >
+            <el-col :span="4"
+              >day_of_week:
+              {{ props.row.day_of_week ? props.row.day_of_week : "-" }}</el-col
+            >
+            <el-col :span="4"
+              >start_date:
+              {{
+                props.row.start_date
+                  ? new Date(props.row.start_date)
+                      .toLocaleString()
+                      .substring(0, 10)
+                  : "-"
+              }}</el-col
+            >
           </el-row>
-          <el-row class="t-row">
-            <el-col :span="4">end_date: {{ props.row.end_date ? new Date(props.row.end_date).toLocaleString().substring(0, 10) : "-" }}</el-col>
-            <el-col :span="4">create_time: {{ props.row.create_time ? new Date(props.row.create_time).toLocaleString() : "-" }}</el-col>
-            <el-col :span="4">update_time: {{ props.row.update_time ? new Date(props.row.update_time).toLocaleString() : "-" }}</el-col>
+          <el-row class="p-[12px]">
+            <el-col :span="4"
+              >end_date:
+              {{
+                props.row.end_date
+                  ? new Date(props.row.end_date)
+                      .toLocaleString()
+                      .substring(0, 10)
+                  : "-"
+              }}</el-col
+            >
+            <el-col :span="4"
+              >create_time:
+              {{
+                props.row.create_time
+                  ? new Date(props.row.create_time).toLocaleString()
+                  : "-"
+              }}</el-col
+            >
+            <el-col :span="4"
+              >update_time:
+              {{
+                props.row.update_time
+                  ? new Date(props.row.update_time).toLocaleString()
+                  : "-"
+              }}</el-col
+            >
           </el-row>
         </template>
       </el-table-column>
@@ -87,7 +136,7 @@
         </template>
       </el-table-column>
     </el-table>
-    <div class="t-pagination">
+    <div class="mt-[10px]">
       <el-pagination
         background
         v-model:current-page="pagination.page"

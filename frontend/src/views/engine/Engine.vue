@@ -1,6 +1,6 @@
 <template>
-  <div class="t-management">
-    <div class="t-management-header">
+  <div class="p-[10px]">
+    <div class="mb-[10px]">
       <el-button type="primary" @click="handleAdd">新增引擎</el-button>
     </div>
 
@@ -41,7 +41,7 @@
         </template>
       </el-table-column>
     </el-table>
-    <div class="t-pagination">
+    <div class="mt-[10px]">
       <el-pagination
         background
         v-model:current-page="pagination.page"

@@ -22,7 +22,7 @@ func NewJobController(db *gorm.DB) *JobController {
 	}
 }
 
-// CreateJob 创建用户
+// CreateJob 创建任务
 func (uc *JobController) CreateJob(c *gin.Context) {
 	var job models.Job
 	if err := c.ShouldBindJSON(&job); err != nil {
@@ -39,7 +39,7 @@ func (uc *JobController) CreateJob(c *gin.Context) {
 	uc.Success(c, job)
 }
 
-// GetJob 获取单个用户
+// GetJob 获取单个任务
 func (uc *JobController) GetJob(c *gin.Context) {
 	id := c.Param("id")
 	job, err := uc.jobService.GetByID(id)
@@ -55,7 +55,7 @@ func (uc *JobController) GetJob(c *gin.Context) {
 	uc.Success(c, job)
 }
 
-// GetPageJobs 分页获取用户列表
+// GetPageJobs 分页获取任务列表
 func (uc *JobController) GetPageJobs(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	size, _ := strconv.Atoi("10")
@@ -68,7 +68,7 @@ func (uc *JobController) GetPageJobs(c *gin.Context) {
 	uc.Success(c, jobs)
 }
 
-// UpdateJob 更新用户
+// UpdateJob 更新用任务
 func (uc *JobController) UpdateJob(c *gin.Context) {
 	var job models.Job
 	if err := c.ShouldBindJSON(&job); err != nil {
@@ -88,7 +88,7 @@ func (uc *JobController) UpdateJob(c *gin.Context) {
 	uc.Success(c, job)
 }
 
-// DeleteJob 删除用户
+// DeleteJob 删除任务
 func (uc *JobController) DeleteJob(c *gin.Context) {
 	var job models.Job
 	if err := c.ShouldBindJSON(&job); err != nil {
