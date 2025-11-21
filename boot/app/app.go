@@ -13,7 +13,7 @@ import (
 func WebSet() *gin.Engine {
 	r := gin.Default()
 	// 设置静态文件目录
-	r.Static("/assets", "./frontend/dist/assets")
+	r.Static("/assets", "./web/assets")
 
 	// 设置i18n中间件
 	r.Use(middlewares.I18nMiddleware())
@@ -26,7 +26,7 @@ func WebSet() *gin.Engine {
 
 	// 网站首页
 	r.GET("/", func(c *gin.Context) {
-		c.File("./frontend/dist/index.html")
+		c.File("./web/index.html")
 	})
 
 	// 设置路由
