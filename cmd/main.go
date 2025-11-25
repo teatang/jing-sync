@@ -5,7 +5,7 @@ import (
 	"jing-sync/boot/app"
 	"jing-sync/boot/config"
 	"jing-sync/boot/database"
-	_ "jing-sync/boot/i18n"
+	"jing-sync/boot/i18n"
 	"jing-sync/boot/logger"
 
 	"github.com/robfig/cron/v3"
@@ -18,6 +18,7 @@ func main() {
 	// 初始化日志
 	logger.LoggerInit()
 	defer logger.GetLogger().Writer().Close()
+	i18n.I18nInit()
 	// 初始化数据库
 	password := database.InitDB()
 
@@ -36,10 +37,10 @@ func main() {
 	r := app.WebSet()
 
 	if password != "" {
-		logger.GetLogger().Info(fmt.Sprintf("admin password:%s", password))
+		logger.GetLogger().Infof("admin password:%s", password)
 	}
 
 	port := config.Cfg.Port
-	logger.GetLogger().Info(fmt.Sprintf("^_^ Running at http://127.0.0.1:%d/", port))
+	logger.GetLogger().Infof("^_^ Running at http://127.0.0.1:%d/", port)
 	r.Run(fmt.Sprintf(":%d", port))
 }

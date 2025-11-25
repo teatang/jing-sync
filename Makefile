@@ -10,7 +10,7 @@ NPM := pnpm
 GO_MAIN_DIR := ./cmd
 BACKEND_BIN_DIR := ./bin
 FRONTEND_DIR := ./frontend
-FRONTEND_OUTPUT_TO := ./web
+FRONTEND_OUTPUT_TO := ./public/web
 
 # 定义 PowerShell 命令前缀，包含必要的参数
 POWERSHELL_PREFIX := powershell.exe -NoProfile -Command
