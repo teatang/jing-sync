@@ -12,35 +12,56 @@ BACKEND_BIN_DIR := ./bin
 FRONTEND_DIR := ./frontend
 FRONTEND_OUTPUT_TO := ./public/web
 
-# 定义 PowerShell 命令前缀，包含必要的参数
-POWERSHELL_PREFIX := powershell.exe -NoProfile -Command
-# Define PowerShell utility functions as make macros for reusability and clarity.
-# Using explicit `POWERSHELL_PREFIX` and ensuring correct quoting for cmd.exe.
-# Remove a directory recursively
-# $1: Path to remove
-define POWERSHELL_RMDIR
-	@$(POWERSHELL_PREFIX) "& { if (Test-Path -Path \"$1\" -PathType Container) { Remove-Item -Recurse -Force -Path \"$1\" -ErrorAction SilentlyContinue | Out-Null } }"
-endef
-# Create a directory (if not exists)
-# $1: Path to create
-define POWERSHELL_MKDIR
-	@$(POWERSHELL_PREFIX) "& { New-Item -ItemType Directory -Path \"$1\" -ErrorAction SilentlyContinue | Out-Null }"
-endef
-# Copy contents of one directory to another
-# '$1': source directory (e.g., frontend/dist)
-# '$2': destination directory (e.g., web)
-# Note: Copy-Item with '*' copies contents, not the directory itself.
-define POWERSHELL_COPY_CONTENTS
-	@$(POWERSHELL_PREFIX) "& { Copy-Item -Path \"$1\\*\" -Destination \"$2\" -Recurse -Force -ErrorAction SilentlyContinue | Out-Null }"
-endef
-
 ifeq ($(OS),Windows_NT)
     PLATFORM = windows
     BACKEND_BIN_NAME = $(PROJECT_NAME).exe
 else
-    PLATFORM = linux
+    PLATFORM = other
 	BACKEND_BIN_NAME = $(PROJECT_NAME)
 endif
+
+# 定义 PowerShell 命令前缀，包含必要的参数
+POWERSHELL_PREFIX := powershell.exe -NoProfile -Command
+
+# Remove a directory recursively
+# $1: Path to remove
+define RMDIR
+	@echo "RMDIR start $(1)"
+	$(if $(filter windows,$(PLATFORM)), \
+		@$(POWERSHELL_PREFIX) "& { if (Test-Path -Path \"$1\" -PathType Container) { Remove-Item -Recurse -Force -Path \"$1\" -ErrorAction SilentlyContinue | Out-Null } }"
+	)
+	$(if $(filter other,$(PLATFORM)), \
+		@rm -rf "$(1)"
+	)
+	@echo "RMDIR end $(1)"
+endef
+
+# Create a directory (if not exists)
+# $1: Path to create
+define MKDIR
+	@echo "MKDIR start $(1)"
+	$(if $(filter windows,$(PLATFORM)), \
+		@$(POWERSHELL_PREFIX) "& { New-Item -ItemType Directory -Path \"$1\" -ErrorAction SilentlyContinue | Out-Null }"
+	)
+	$(if $(filter other,$(PLATFORM)), \
+		@mkdir -p "$(1)"
+	)
+	@echo "MKDIR end $(1)"
+endef
+
+# Copy contents of one directory to another
+# '$1': source directory (e.g., frontend/dist)
+# '$2': destination directory (e.g., web)
+define COPY_CONTENTS
+	@echo "COPY_CONTENTS start $(1)/* to $(2)"
+	$(if $(filter windows,$(PLATFORM)), \
+		@$(POWERSHELL_PREFIX) "& { Copy-Item -Path \"$1\\*\" -Destination \"$2\" -Recurse -Force -ErrorAction SilentlyContinue | Out-Null }"
+	)
+	$(if $(filter other,$(PLATFORM)), \
+		@cp -r "$(1)/" "$(2)"
+	)
+	@echo "COPY_CONTENTS end $(1)/* to $(2)"
+endef
 
 BACKEND_OUTPUT := $(BACKEND_BIN_DIR)/$(BACKEND_BIN_NAME)
  # Vite 默认输出到 dist 目录
@@ -57,12 +78,12 @@ frontend-deps:
 # Build the frontend application using Vite
 build-frontend: frontend-deps
 	@echo "Building frontend with Vite..."
-	@cd $(FRONTEND_DIR) && $(NPM) run build
+# 	@cd $(FRONTEND_DIR) && $(NPM) run build
 	@echo "Frontend built to $(FRONTEND_BUILD_DIR)"
 	@echo "Copying frontend build to $(FRONTEND_OUTPUT_TO)"
-	$(call POWERSHELL_RMDIR,$(FRONTEND_OUTPUT_TO))
-	$(call POWERSHELL_MKDIR,$(FRONTEND_OUTPUT_TO))
-	$(call POWERSHELL_COPY_CONTENTS,$(FRONTEND_BUILD_DIR),$(FRONTEND_OUTPUT_TO))
+	$(call RMDIR,$(FRONTEND_OUTPUT_TO))
+	$(call MKDIR,$(FRONTEND_OUTPUT_TO))
+	$(call COPY_CONTENTS,$(FRONTEND_BUILD_DIR),$(FRONTEND_OUTPUT_TO))
 	@echo "Frontend build copied to $(FRONTEND_OUTPUT_TO)."
 
 # Start the Vite development server with hot-reloading
@@ -75,8 +96,8 @@ df: dev-frontend
 # Build the Go backend application
 build-backend:
 	@echo "Building Go backend..."
-	$(call POWERSHELL_RMDIR,$(BACKEND_BIN_DIR))
-	$(call POWERSHELL_MKDIR,$(BACKEND_BIN_DIR))
+	$(call RMDIR,$(BACKEND_BIN_DIR))
+	$(call MKDIR,$(BACKEND_BIN_DIR))
 	$(GO) build $(GO_BUILD_FLAGS) -o $(BACKEND_OUTPUT) $(GO_MAIN_DIR)/$(GO_MAIN_FILE)
 	@echo "Backend built to $(BACKEND_OUTPUT)"
 
@@ -108,9 +129,9 @@ build: build-frontend build-backend
 # --- Clean Target ---
 clean:
 	@echo "Cleaning generated files..."
-	$(call POWERSHELL_RMDIR,$(BACKEND_BIN_DIR))
-	$(call POWERSHELL_RMDIR,$(FRONTEND_BUILD_DIR))
-	$(call POWERSHELL_RMDIR,$(FRONTEND_OUTPUT_TO))
+	$(call RMDIR,$(BACKEND_BIN_DIR))
+	$(call RMDIR,$(FRONTEND_BUILD_DIR))
+	$(call RMDIR,$(FRONTEND_OUTPUT_TO))
 # 	@rm -rf $(BACKEND_BIN_DIR)
 # 	@rm -rf $(FRONTEND_DIR)/node_modules
 # 	@rm -rf $(FRONTEND_BUILD_DIR)
