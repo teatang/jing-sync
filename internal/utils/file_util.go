@@ -2,6 +2,7 @@ package utils
 
 import (
 	"os"
+	"strconv"
 )
 
 func FileExists(path string) bool {
@@ -26,4 +27,8 @@ func EnsureDir(dir string) error {
 		return err
 	}
 	return nil
+}
+
+func UintToString(i uint) string {
+	return strconv.FormatUint(uint64(i), 10)
 }

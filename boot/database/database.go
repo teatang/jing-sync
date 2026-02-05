@@ -40,7 +40,7 @@ func InitDB() string {
 }
 
 func AutoMigrate(db *gorm.DB) string {
-	db.AutoMigrate(&models.User{}, &models.Engine{}, &models.Job{})
+	db.AutoMigrate(&models.User{}, &models.Engine{}, &models.Job{}, &models.SyncLog{})
 	password, err := utils.SecureRandString(10)
 	if err != nil {
 		panic(err)

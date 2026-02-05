@@ -78,7 +78,7 @@ frontend-deps:
 # Build the frontend application using Vite
 build-frontend: frontend-deps
 	@echo "Building frontend with Vite..."
-# 	@cd $(FRONTEND_DIR) && $(NPM) run build
+	@cd $(FRONTEND_DIR) && $(NPM) run build
 	@echo "Frontend built to $(FRONTEND_BUILD_DIR)"
 	@echo "Copying frontend build to $(FRONTEND_OUTPUT_TO)"
 	$(call RMDIR,$(FRONTEND_OUTPUT_TO))
@@ -115,28 +115,20 @@ dev-backend:
 
 db: dev-backend
 
-# Run Go tests
-# test:
-# 	@echo "Running Go tests..."
-# 	$(GO) test ./...
 
-# --- Combined Targets ---
-
-# Full build: frontend + backend
 build: build-frontend build-backend
 	@echo "Full build complete."
 
-# --- Clean Target ---
+test:
+	@$(GO) test ./...
+
+test-race:
+	@$(GO) test -race ./...
+
 clean:
 	@echo "Cleaning generated files..."
 	$(call RMDIR,$(BACKEND_BIN_DIR))
 	$(call RMDIR,$(FRONTEND_BUILD_DIR))
 	$(call RMDIR,$(FRONTEND_OUTPUT_TO))
-# 	@rm -rf $(BACKEND_BIN_DIR)
-# 	@rm -rf $(FRONTEND_DIR)/node_modules
-# 	@rm -rf $(FRONTEND_BUILD_DIR)
-# 	@rm -rf $(FRONTEND_OUTPUT_TO)
 	@$(GO) clean
 	@echo "Clean complete."
-
-.DEFAULT_GOAL := all
