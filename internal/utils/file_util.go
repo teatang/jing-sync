@@ -32,3 +32,18 @@ func EnsureDir(dir string) error {
 func UintToString(i uint) string {
 	return strconv.FormatUint(uint64(i), 10)
 }
+
+// FormatBytes 将字节大小转换为人类可读的字符串，如 1.00 KB, 2.50 MB
+func FormatBytes(bytes int64) string {
+	if bytes < 1024 {
+		return strconv.FormatInt(bytes, 10) + " B"
+	}
+	units := []string{"B", "KB", "MB", "GB", "TB", "PB"}
+	var i int
+	val := float64(bytes)
+	for val >= 1024 && i < len(units)-1 {
+		val /= 1024
+		i++
+	}
+	return strconv.FormatFloat(val, 'f', 2, 64) + " " + units[i]
+}
