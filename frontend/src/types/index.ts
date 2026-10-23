@@ -37,24 +37,32 @@ export interface Job {
   src_path: string;
   dst_path: string;
   engine_id: number;
+  user_id?: number;
   speed: number;
-  method: number;
-  interval: number;
-  is_cron: number;
-  year: string;
-  month: string;
-  day: string;
-  week: string;
-  day_of_week: string;
-  hour: string;
-  minute: string;
-  second: string;
-  start_date: string;
-  end_date: string;
-  exclude: string;
-  status: boolean;
+  sync_mode: number; // 0: 全量, 1: 仅新增, 2: 移动
+  method?: string;
+  interval?: number;
+  is_cron?: number;
+  cron_expr?: string;
+  min_size?: number | null;
+  max_size?: number | null;
+  excludes?: string;
+  enabled: number; // 1: 启用, 0: 禁用
+  status?: number | boolean;
   create_time?: string;
   update_time?: string;
+}
+
+export interface SyncLog {
+  id?: number;
+  job_id: number;
+  status: number; // 1: 成功, 0: 失败
+  error_msg?: string;
+  files_added: number;
+  start_time: string;
+  end_time: string;
+  details?: string;
+  create_time?: string;
 }
 
 export interface LoginInfo {

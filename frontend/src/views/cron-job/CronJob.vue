@@ -1,149 +1,151 @@
 <template>
-  <div class="p-[10px]">
-    <div class="mb-[10px]">
-      <el-button type="primary" @click="handleAdd">新增任务</el-button>
+  <div class="space-y-4">
+    <!-- 顶部操作栏 -->
+    <div class="flex items-center justify-between bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs">
+      <div>
+        <h2 class="text-base font-semibold text-slate-800 dark:text-slate-100">定时同步任务</h2>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">配置源与目标目录映射、差异同步规则、过滤排除项与自动调度计划</p>
+      </div>
+      <el-button type="primary" :icon="Plus" @click="handleAdd">
+        新建同步任务
+      </el-button>
     </div>
 
-    <el-table :data="jobs" style="width: 100%">
-      <el-table-column type="expand">
-        <template #default="props">
-          <el-row class="p-[12px]">
-            <el-col :span="4"
-              >method:
-              {{
-                getSelectOptionName(props.row.speed, JOB_METHOD_CONFIGS)
-              }}</el-col
-            >
-            <el-col :span="4"
-              >speed:
-              {{
-                getSelectOptionName(props.row.speed, JOB_SPEED_CONFIGS)
-              }}</el-col
-            >
-            <el-col :span="4"
-              >method:
-              {{
-                getSelectOptionName(props.row.is_cron, JOB_IS_CRON_CONFIGS)
-              }}</el-col
-            >
-            <el-col :span="4"
-              >year: {{ props.row.year ? props.row.year : "-" }}</el-col
-            >
-            <el-col :span="4"
-              >month: {{ props.row.month ? props.row.month : "-" }}</el-col
-            >
-            <el-col :span="4"
-              >day: {{ props.row.day ? props.row.day : "-" }}</el-col
-            >
-          </el-row>
-          <el-row class="p-[12px]">
-            <el-col :span="4"
-              >hour: {{ props.row.hour ? props.row.hour : "-" }}</el-col
-            >
-            <el-col :span="4"
-              >minute: {{ props.row.minute ? props.row.minute : "-" }}</el-col
-            >
-            <el-col :span="4"
-              >second: {{ props.row.second ? props.row.second : "-" }}</el-col
-            >
-            <el-col :span="4"
-              >week: {{ props.row.week ? props.row.week : "-" }}</el-col
-            >
-            <el-col :span="4"
-              >day_of_week:
-              {{ props.row.day_of_week ? props.row.day_of_week : "-" }}</el-col
-            >
-            <el-col :span="4"
-              >start_date:
-              {{
-                props.row.start_date
-                  ? new Date(props.row.start_date)
-                      .toLocaleString()
-                      .substring(0, 10)
-                  : "-"
-              }}</el-col
-            >
-          </el-row>
-          <el-row class="p-[12px]">
-            <el-col :span="4"
-              >end_date:
-              {{
-                props.row.end_date
-                  ? new Date(props.row.end_date)
-                      .toLocaleString()
-                      .substring(0, 10)
-                  : "-"
-              }}</el-col
-            >
-            <el-col :span="4"
-              >create_time:
-              {{
-                props.row.create_time
-                  ? new Date(props.row.create_time).toLocaleString()
-                  : "-"
-              }}</el-col
-            >
-            <el-col :span="4"
-              >update_time:
-              {{
-                props.row.update_time
-                  ? new Date(props.row.update_time).toLocaleString()
-                  : "-"
-              }}</el-col
-            >
-          </el-row>
-        </template>
-      </el-table-column>
-      <el-table-column label="状态">
-        <template #default="scope">
-          <el-text :type="scope.row.status == 1 ? 'success' : 'danger'">
-            {{ getSelectOptionName(scope.row.status, JOB_IS_ENABLE_CONFIG) }}
-          </el-text>
-        </template>
-      </el-table-column>
-      <el-table-column prop="src_path" label="来源目录" />
-      <el-table-column prop="dst_path" label="目标目录" />
-      <el-table-column label="创建时间">
-        <template #default="scope">
-          {{
-            scope.row.create_time
-              ? new Date(scope.row.create_time).toLocaleString()
-              : "-"
-          }}
-        </template>
-      </el-table-column>
-      <el-table-column label="更新时间">
-        <template #default="scope">
-          {{
-            scope.row.update_time
-              ? new Date(scope.row.update_time).toLocaleString()
-              : "-"
-          }}
-        </template>
-      </el-table-column>
-      <el-table-column fixed="right" label="操作" min-width="100">
-        <template #default="scope">
-          <el-button size="small" @click="handleEdit(scope.row)">
-            Edit
-          </el-button>
-          <el-button
-            size="small"
-            type="danger"
-            @click="handleDelete(scope.row)"
-          >
-            Delete
-          </el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-    <div class="mt-[10px]">
-      <el-pagination
-        background
-        v-model:current-page="pagination.page"
-        :page-size="pagination.size"
-        :total="pagination.total"
-        @current-change="fetchJobs"
-      />
+    <!-- 任务列表卡片 -->
+    <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 shadow-xs">
+      <el-table
+        :data="jobs"
+        v-loading="loading"
+        style="width: 100%"
+        class="!bg-transparent"
+      >
+        <el-table-column type="expand">
+          <template #default="{ row }">
+            <div class="p-4 bg-slate-50 dark:bg-slate-950/60 rounded-lg text-xs space-y-2 border border-slate-100 dark:border-slate-850">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <span class="text-slate-400">排除通配规则: </span>
+                  <code class="text-slate-700 dark:text-slate-300">{{ row.excludes || '无 (全部同步)' }}</code>
+                </div>
+                <div>
+                  <span class="text-slate-400">文件大小限制: </span>
+                  <span class="text-slate-700 dark:text-slate-300">
+                    {{ formatSizeLimit(row.min_size, row.max_size) }}
+                  </span>
+                </div>
+                <div>
+                  <span class="text-slate-400">扫描速率模式: </span>
+                  <span class="text-slate-700 dark:text-slate-300">{{ getSpeedName(row.speed) }}</span>
+                </div>
+              </div>
+              <div class="text-slate-400 pt-1 border-t border-slate-200/50 dark:border-slate-800/50">
+                <span>更新时间: {{ row.update_time ? new Date(row.update_time).toLocaleString() : '-' }}</span>
+              </div>
+            </div>
+          </template>
+        </el-table-column>
+
+        <el-table-column prop="remark" label="任务名称" min-width="150">
+          <template #default="{ row }">
+            <div class="font-medium text-slate-800 dark:text-slate-200">
+              {{ row.remark || '未命名任务' }}
+            </div>
+          </template>
+        </el-table-column>
+
+        <el-table-column label="同步模式" min-width="130">
+          <template #default="{ row }">
+            <el-tag :type="getSyncModeTagType(row.sync_mode)" size="small">
+              {{ getSyncModeName(row.sync_mode) }}
+            </el-tag>
+          </template>
+        </el-table-column>
+
+        <el-table-column label="路径映射" min-width="260">
+          <template #default="{ row }">
+            <div class="flex items-center gap-1.5 text-xs font-mono">
+              <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 truncate max-w-[120px]" :title="row.src_path">
+                {{ row.src_path }}
+              </span>
+              <el-icon class="text-slate-400"><Right /></el-icon>
+              <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 truncate max-w-[120px]" :title="row.dst_path">
+                {{ row.dst_path }}
+              </span>
+            </div>
+          </template>
+        </el-table-column>
+
+        <el-table-column label="调度周期" min-width="130">
+          <template #default="{ row }">
+            <span class="text-xs text-slate-600 dark:text-slate-400">
+              {{ getScheduleDesc(row) }}
+            </span>
+          </template>
+        </el-table-column>
+
+        <el-table-column label="状态" width="100">
+          <template #default="{ row }">
+            <el-switch
+              :model-value="row.enabled === 1"
+              :loading="togglingId === row.id"
+              inline-prompt
+              active-text="开"
+              inactive-text="关"
+              @change="() => handleToggle(row)"
+            />
+          </template>
+        </el-table-column>
+
+        <el-table-column fixed="right" label="操作" min-width="260">
+          <template #default="{ row }">
+            <div class="flex items-center gap-1.5">
+              <el-button
+                size="small"
+                type="primary"
+                plain
+                :icon="RefreshRight"
+                :loading="syncingId === row.id"
+                @click="handleTriggerSync(row)"
+              >
+                立即同步
+              </el-button>
+              <el-button
+                size="small"
+                :icon="Document"
+                @click="handleViewLogs(row)"
+              >
+                日志
+              </el-button>
+              <el-button
+                size="small"
+                @click="handleEdit(row)"
+              >
+                编辑
+              </el-button>
+              <el-button
+                size="small"
+                type="danger"
+                plain
+                @click="handleDelete(row)"
+              >
+                删除
+              </el-button>
+            </div>
+          </template>
+        </el-table-column>
+      </el-table>
+
+      <!-- 分页栏 -->
+      <div class="mt-4 flex justify-end">
+        <el-pagination
+          background
+          v-model:current-page="pagination.page"
+          :page-size="pagination.size"
+          :total="pagination.total"
+          layout="total, prev, pager, next"
+          @current-change="fetchJobs"
+        />
+      </div>
     </div>
   </div>
 
@@ -158,54 +160,113 @@
 
 <script lang="ts" setup>
 import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
 import RestClient from "@/utils/rest-client";
-import type {
-  Job,
-  Pagination,
-  InfoList,
-  JobSelectOptionConfig,
-} from "@/types/index";
+import type { Job, Pagination, InfoList } from "@/types/index";
 import CronJobDialog from "@/views/cron-job/CronJobDialog.vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-import {
-  JOB_IS_ENABLE_CONFIG,
-  JOB_SPEED_CONFIGS,
-  JOB_METHOD_CONFIGS,
-  JOB_IS_CRON_CONFIGS,
-} from "@/const/index";
+import { Plus, Right, RefreshRight, Document } from "@element-plus/icons-vue";
+import { formatBytes } from "@/utils/format";
+import { SYNC_MODE_CONFIGS, JOB_SPEED_CONFIGS } from "@/const/index";
 
+const router = useRouter();
 const jobs = ref<Job[]>([]);
 const currentJob = ref<Partial<Job>>({});
 const dialogVisible = ref(false);
 const dialogMode = ref<"add" | "edit">("add");
+const loading = ref(false);
+const syncingId = ref<number | null>(null);
+const togglingId = ref<number | null>(null);
+
 const pagination = ref<Pagination>({
   page: 1,
   size: 10,
   total: 0,
 });
 
-const getSelectOptionName = (
-  speedId: number,
-  configs: JobSelectOptionConfig[]
-) => {
-  return configs.find((item) => item.id === speedId)?.name || "";
-};
+function getSyncModeName(mode?: number) {
+  const item = SYNC_MODE_CONFIGS.find((m) => m.id === mode);
+  return item ? item.name : "仅新增";
+}
+
+function getSyncModeTagType(mode?: number) {
+  if (mode === 0) return "warning";
+  if (mode === 2) return "danger";
+  return "success";
+}
+
+function getSpeedName(speed?: number) {
+  const item = JOB_SPEED_CONFIGS.find((s) => s.id === speed);
+  return item ? item.name : "标准速率";
+}
+
+function formatSizeLimit(min?: number | null, max?: number | null) {
+  if (!min && !max) return "无限制";
+  if (min && !max) return `>= ${formatBytes(min)}`;
+  if (!min && max) return `<= ${formatBytes(max)}`;
+  return `${formatBytes(min!)} ~ ${formatBytes(max!)}`;
+}
+
+function getScheduleDesc(job: Job) {
+  if (job.is_cron === 2) return "仅手动触发";
+  if (job.is_cron === 1) return job.cron_expr ? `Cron: ${job.cron_expr}` : "Cron定时";
+  return `每 ${job.interval || 60} 分钟`;
+}
 
 const fetchJobs = async () => {
+  loading.value = true;
   try {
     const infoList = await new RestClient().get<InfoList<Job>>("/job", {
       page: pagination.value.page,
       size: pagination.value.size,
     });
-    jobs.value = infoList.list as Job[];
-    pagination.value = infoList.pagination as Pagination;
+    jobs.value = (infoList?.list || []) as Job[];
+    pagination.value = (infoList?.pagination || { page: 1, size: 10, total: 0 }) as Pagination;
   } catch (error) {
     ElMessage.error(`${error}`);
+  } finally {
+    loading.value = false;
   }
 };
 
+const handleToggle = async (job: Job) => {
+  togglingId.value = job.id!;
+  try {
+    await new RestClient().put(`/job/${job.id}/toggle`, {});
+    job.enabled = job.enabled === 1 ? 0 : 1;
+    ElMessage.success(job.enabled === 1 ? "已启用任务" : "已暂停任务");
+  } catch (error: any) {
+    ElMessage.error(`切换状态失败: ${error?.message || error}`);
+  } finally {
+    togglingId.value = null;
+  }
+};
+
+const handleTriggerSync = async (job: Job) => {
+  syncingId.value = job.id!;
+  try {
+    const res: any = await new RestClient().post(`/job/${job.id}/sync`, {});
+    const added = res?.files_added ?? 0;
+    ElMessage.success(`同步成功！新增/传输文件数: ${added}`);
+  } catch (error: any) {
+    ElMessage.error(`同步执行失败: ${error?.message || error}`);
+  } finally {
+    syncingId.value = null;
+  }
+};
+
+const handleViewLogs = (job: Job) => {
+  router.push({ path: "/sync-logs", query: { job_id: job.id } });
+};
+
 const handleAdd = () => {
-  currentJob.value = {};
+  currentJob.value = {
+    enabled: 1,
+    sync_mode: 1,
+    speed: 0,
+    interval: 60,
+    is_cron: 0,
+  };
   dialogMode.value = "add";
   dialogVisible.value = true;
 };
@@ -218,20 +279,22 @@ const handleEdit = (job: Job) => {
 
 const handleDelete = async (job: Job) => {
   try {
-    await ElMessageBox.confirm("确认删除该数据吗？", "提示", {
+    await ElMessageBox.confirm(`确认删除同步任务 "${job.remark || job.src_path}" 吗？`, "删除警告", {
       type: "warning",
+      confirmButtonText: "确认删除",
+      cancelButtonText: "取消",
     });
     await new RestClient().delete<Job[]>("/job", job);
     ElMessage.success("删除成功");
     fetchJobs();
   } catch (error) {
-    ElMessage.error(`${error}`);
+    if (error !== "cancel") {
+      ElMessage.error(`${error}`);
+    }
   }
 };
 
-onMounted(async () => {
+onMounted(() => {
   fetchJobs();
 });
 </script>
-
-<style scoped></style>
