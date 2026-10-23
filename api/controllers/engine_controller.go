@@ -2,8 +2,9 @@ package controllers
 
 import (
 	"jing-sync/internal/models"
-	"jing-sync/internal/utils"
+	"jing-sync/internal/services"
 	"jing-sync/internal/services/db_services"
+	"jing-sync/internal/utils"
 	"net/http"
 	"strconv"
 
@@ -14,11 +15,13 @@ import (
 type EngineController struct {
 	BaseController
 	engineService *db_services.EngineService
+	db            *gorm.DB
 }
 
 func NewEngineController(db *gorm.DB) *EngineController {
 	return &EngineController{
 		engineService: db_services.NewEngineService(db),
+		db:            db,
 	}
 }
 
@@ -101,4 +104,42 @@ func (ec *EngineController) DeleteEngine(c *gin.Context) {
 	}
 
 	ec.Success(c, engine)
+}
+
+type TestEngineRequest struct {
+	ID    uint   `json:"id"`
+	Url   string `json:"url"`
+	Token string `json:"token"`
+}
+
+// TestEngine 测试引擎连通性
+func (ec *EngineController) TestEngine(c *gin.Context) {
+	var req TestEngineRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		ec.Error(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	var engine *models.Engine
+	if req.ID > 0 {
+		var err error
+		engine, err = ec.engineService.GetByID(strconv.Itoa(int(req.ID)))
+		if err != nil {
+			ec.Error(c, http.StatusNotFound, "Engine not found")
+			return
+		}
+	} else {
+		engine = &models.Engine{
+			Url:   req.Url,
+			Token: req.Token,
+		}
+	}
+
+	client := services.NewOpenListClientFromEngine(engine, ec.db)
+	if err := client.TestConnection(); err != nil {
+		ec.Error(c, http.StatusBadRequest, "Connection test failed: "+err.Error())
+		return
+	}
+
+	ec.Success(c, gin.H{"status": "ok", "message": "Connection test passed"})
 }

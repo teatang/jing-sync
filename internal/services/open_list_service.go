@@ -65,6 +65,13 @@ func NewOpenListClient(id string, db *gorm.DB) *OpenListClient {
 	}
 }
 
+func NewOpenListClientFromEngine(engine *models.Engine, db *gorm.DB) *OpenListClient {
+	return &OpenListClient{
+		Engine: engine,
+		db:     db,
+	}
+}
+
 type OpenListClient struct {
 	Engine *models.Engine
 	db     *gorm.DB

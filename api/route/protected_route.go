@@ -27,6 +27,7 @@ func NewProtectedRoute(r *gin.Engine) {
 		api.DELETE("/user", userController.DeleteUser)
 
 		api.POST("/engine", engineController.CreateEngine)
+		api.POST("/engine/test", engineController.TestEngine)
 		api.GET("/engine", engineController.GetPageEngines)
 		api.GET("/engine/:id", engineController.GetEngine)
 		api.PUT("/engine", engineController.UpdateEngine)
@@ -36,11 +37,13 @@ func NewProtectedRoute(r *gin.Engine) {
 		api.GET("/job", jobController.GetPageJobs)
 		api.GET("/job/:id", jobController.GetJob)
 		api.PUT("/job", jobController.UpdateJob)
+		api.PUT("/job/:id/toggle", jobController.ToggleJob)
 		api.DELETE("/job", jobController.DeleteJob)
 
 		api.GET("/open-list", openListController.GetPageOpenList)
 
 		// 同步日志相关
+		api.GET("/sync-logs", syncLogController.GetAllSyncLogs)
 		api.GET("/job/:job_id/sync-logs", syncLogController.GetSyncLogsByJobId)
 		api.GET("/sync-log/:id", syncLogController.GetSyncLog)
 		api.POST("/job/:job_id/sync", syncLogController.TriggerSyncManually)

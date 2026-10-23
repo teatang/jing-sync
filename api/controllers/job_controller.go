@@ -108,3 +108,30 @@ func (uc *JobController) DeleteJob(c *gin.Context) {
 
 	uc.Success(c, job)
 }
+
+// ToggleJob 切换任务启用/禁用状态
+func (uc *JobController) ToggleJob(c *gin.Context) {
+	id := c.Param("id")
+	job, err := uc.jobService.GetByID(id)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			uc.Error(c, http.StatusNotFound, "Job not found")
+		} else {
+			uc.Error(c, http.StatusInternalServerError, err.Error())
+		}
+		return
+	}
+
+	if job.Enabled == 1 {
+		job.Enabled = 0
+	} else {
+		job.Enabled = 1
+	}
+
+	if err := uc.jobService.Update(job); err != nil {
+		uc.Error(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	uc.Success(c, job)
+}

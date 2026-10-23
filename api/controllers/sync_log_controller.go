@@ -77,3 +77,17 @@ func (c *SyncLogController) TriggerSyncManually(ctx *gin.Context) {
 
 	c.Success(ctx, syncLog)
 }
+
+// GetAllSyncLogs 获取全局最新同步日志列表
+func (c *SyncLogController) GetAllSyncLogs(ctx *gin.Context) {
+	page, _ := strconv.Atoi(ctx.DefaultQuery("page", "1"))
+	size, _ := strconv.Atoi(ctx.DefaultQuery("size", "10"))
+
+	logs, err := c.syncService.ListAllSyncLogs(page, size)
+	if err != nil {
+		c.Error(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.Success(ctx, logs)
+}
