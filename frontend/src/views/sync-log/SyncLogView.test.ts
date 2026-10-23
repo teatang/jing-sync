@@ -13,7 +13,10 @@ describe("SyncLogView.vue", () => {
     setActivePinia(createPinia());
     router = createRouter({
       history: createMemoryHistory(),
-      routes: [{ path: "/sync-logs", component: { template: "<div />" } }],
+      routes: [
+        { path: "/", component: { template: "<div />" } },
+        { path: "/sync-logs", component: { template: "<div />" } },
+      ],
     });
     vi.spyOn(RestClient.prototype, "get").mockImplementation((url: string) => {
       if (url.includes("/sync-logs")) {

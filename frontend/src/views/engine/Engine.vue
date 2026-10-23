@@ -147,7 +147,7 @@ const fetchEngines = async () => {
 };
 
 const handleTestConnection = async (engine: Engine) => {
-  testingId.value = engine.id;
+  testingId.value = engine.id ?? null;
   try {
     await new RestClient().post("/engine/test", { id: engine.id });
     ElMessage.success(`引擎 [${engine.remark || engine.url}] 连接测试成功！`);

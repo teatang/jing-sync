@@ -21,7 +21,7 @@ describe("ThemeSwitch.vue", () => {
   });
 
   it("changes theme when setTheme is called via store", async () => {
-    const wrapper = mount(ThemeSwitch, {
+    mount(ThemeSwitch, {
       global: {
         plugins: [ElementPlus, i18n],
       },
