@@ -23,6 +23,10 @@ func GetLogger() *logrus.Logger {
 
 // LoggerInit函数用于初始化日志记录器
 func LoggerInit() {
+	if config.Cfg == nil {
+		config.SetDefaultConfig(config.EnvTypeTest)
+	}
+
 	// 创建一个新的日志记录器
 	logger = logrus.New()
 
