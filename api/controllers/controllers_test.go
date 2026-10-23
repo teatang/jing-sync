@@ -120,3 +120,24 @@ func TestSyncLogListAllEndpoint(t *testing.T) {
 	assert.Equal(t, true, resp["success"])
 	assert.Equal(t, float64(0), resp["code"])
 }
+
+func TestGetSyncLogsByJobIdEndpoint(t *testing.T) {
+	db := setupControllerTestDB(t)
+	sc := NewSyncLogController(db)
+
+	log1 := &models.SyncLog{JobId: 10, Status: 1, FilesAdded: 3}
+	require.NoError(t, db.Create(log1).Error)
+
+	r := gin.New()
+	r.GET("/api/job/:id/sync-logs", sc.GetSyncLogsByJobId)
+
+	req, _ := http.NewRequest(http.MethodGet, "/api/job/10/sync-logs?page=1&size=10", nil)
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	var resp map[string]interface{}
+	require.NoError(t, json.Unmarshal(w.Body.Bytes(), &resp))
+	assert.Equal(t, true, resp["success"])
+	assert.Equal(t, float64(0), resp["code"])
+}

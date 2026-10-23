@@ -44,8 +44,8 @@ func NewProtectedRoute(r *gin.Engine) {
 
 		// 同步日志相关
 		api.GET("/sync-logs", syncLogController.GetAllSyncLogs)
-		api.GET("/job/:job_id/sync-logs", syncLogController.GetSyncLogsByJobId)
+		api.GET("/job/:id/sync-logs", syncLogController.GetSyncLogsByJobId)
 		api.GET("/sync-log/:id", syncLogController.GetSyncLog)
-		api.POST("/job/:job_id/sync", syncLogController.TriggerSyncManually)
+		api.POST("/job/:id/sync", syncLogController.TriggerSyncManually)
 	}
 }

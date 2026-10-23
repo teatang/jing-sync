@@ -22,7 +22,11 @@ func NewSyncLogController(db *gorm.DB) *SyncLogController {
 
 // GetSyncLogsByJobId 获取任务的同步日志列表
 func (c *SyncLogController) GetSyncLogsByJobId(ctx *gin.Context) {
-	jobId, err := strconv.ParseUint(ctx.Param("job_id"), 10, 32)
+	jobIdParam := ctx.Param("id")
+	if jobIdParam == "" {
+		jobIdParam = ctx.Param("job_id")
+	}
+	jobId, err := strconv.ParseUint(jobIdParam, 10, 32)
 	if err != nil {
 		c.Error(ctx, http.StatusBadRequest, "Invalid job ID")
 		return
@@ -63,7 +67,11 @@ func (c *SyncLogController) GetSyncLog(ctx *gin.Context) {
 
 // TriggerSyncManually 手动触发同步
 func (c *SyncLogController) TriggerSyncManually(ctx *gin.Context) {
-	jobId, err := strconv.ParseUint(ctx.Param("job_id"), 10, 32)
+	jobIdParam := ctx.Param("id")
+	if jobIdParam == "" {
+		jobIdParam = ctx.Param("job_id")
+	}
+	jobId, err := strconv.ParseUint(jobIdParam, 10, 32)
 	if err != nil {
 		c.Error(ctx, http.StatusBadRequest, "Invalid job ID")
 		return
