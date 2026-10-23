@@ -40,7 +40,7 @@ export default defineConfig({
     open: true,
     proxy: {
       "/api": {
-        target: "htttp://localhost:8888",
+        target: "http://localhost:8888",
         changeOrigin: true, // 是否跨域
         // rewrite: (path) => path.replace(/^\/api/, '') // 重写路径，去掉 /api
       },

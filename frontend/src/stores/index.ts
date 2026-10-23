@@ -65,3 +65,7 @@ export const useUserStore = defineStore<string, LoginInfo, {}, UserActions>('use
     }
   }
 })
+
+export { useThemeStore } from "./themeStore";
+export { useLocaleStore } from "./localeStore";
+
