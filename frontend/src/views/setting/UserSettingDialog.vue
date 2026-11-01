@@ -2,28 +2,35 @@
   <el-dialog
     v-model="visible"
     :title="mode === 'add' ? '新增用户' : '编辑用户'"
-    width="500px"
+    width="480px"
+    class="rounded-xl"
     @close="handleClose"
   >
-    <el-form :model="form" label-width="80px" ref="formRef">
+    <el-form :model="form" label-position="top" ref="formRef" class="space-y-3">
       <el-form-item
-        label="username"
+        label="用户名 (Username)"
         prop="username"
-        :rules="[{ required: true, message: '请输入username' }]"
+        :rules="[{ required: true, message: '请输入用户名' }]"
       >
-        <el-input v-model="form.username" />
+        <el-input v-model="form.username" placeholder="请输入用户名" clearable />
       </el-form-item>
       <el-form-item
-        label="password"
+        label="密码 (Password)"
         prop="password"
-        :rules="[{ required: true, message: '请输入password' }]"
+        :rules="[{ required: true, message: '请输入密码' }]"
       >
-        <el-input v-model="form.password" />
+        <el-input
+          v-model="form.password"
+          type="password"
+          placeholder="请输入登录密码"
+          show-password
+          clearable
+        />
       </el-form-item>
     </el-form>
     <template #footer>
       <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="handleSubmit">确认</el-button>
+      <el-button type="primary" :loading="submitting" @click="handleSubmit">确认保存</el-button>
     </template>
   </el-dialog>
 </template>
@@ -49,6 +56,7 @@ const props = defineProps({
 const emit = defineEmits(["update:modelValue", "success"]);
 
 const visible = ref(false);
+const submitting = ref(false);
 const form = ref<Partial<User>>({});
 const formRef = ref();
 
@@ -73,17 +81,22 @@ const handleClose = () => {
 const handleSubmit = async () => {
   try {
     await formRef.value.validate();
+    submitting.value = true;
     if (props.mode === "add") {
       await new RestClient().post<number>("/user", form.value);
-      ElMessage.success("新增成功");
+      ElMessage.success("新增用户成功");
     } else {
       await new RestClient().put<number>("/user", form.value);
-      ElMessage.success("更新成功");
+      ElMessage.success("更新用户成功");
     }
     emit("success");
     visible.value = false;
   } catch (e) {
-    ElMessage.error(`${e}`);
+    if (e) {
+      ElMessage.error(`${e}`);
+    }
+  } finally {
+    submitting.value = false;
   }
 };
 </script>

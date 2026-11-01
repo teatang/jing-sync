@@ -60,35 +60,39 @@
         <el-form-item
           label="源路径 (Source Path)"
           prop="src_path"
-          :rules="[{ required: true, message: '请选择或输入源目录路径' }]"
+          :rules="[{ required: true, message: '请输入或选择源目录路径' }]"
         >
-          <el-cascader
-            class="w-full"
-            v-model="srcPathList"
-            :props="cascaderSrcPathProps"
-            :options="srcPathCascaderNode"
-            :placeholder="form.src_path || '请浏览选择或直接输入源路径'"
+          <el-input
+            v-model="form.src_path"
+            placeholder="直接输入或点击右侧浏览选择"
             :disabled="!form.engine_id"
-            filterable
             clearable
-          />
+          >
+            <template #append>
+              <el-button :disabled="!form.engine_id" @click="openPathSelector('src_path')">
+                浏览
+              </el-button>
+            </template>
+          </el-input>
         </el-form-item>
 
         <el-form-item
           label="目标路径 (Destination Path)"
           prop="dst_path"
-          :rules="[{ required: true, message: '请选择或输入目标目录路径' }]"
+          :rules="[{ required: true, message: '请输入或选择目标目录路径' }]"
         >
-          <el-cascader
-            class="w-full"
-            v-model="dstPathList"
-            :props="cascaderSrcPathProps"
-            :options="dstPathCascaderNode"
-            :placeholder="form.dst_path || '请浏览选择或直接输入目标路径'"
+          <el-input
+            v-model="form.dst_path"
+            placeholder="直接输入或点击右侧浏览选择"
             :disabled="!form.engine_id"
-            filterable
             clearable
-          />
+          >
+            <template #append>
+              <el-button :disabled="!form.engine_id" @click="openPathSelector('dst_path')">
+                浏览
+              </el-button>
+            </template>
+          </el-input>
         </el-form-item>
       </div>
 
@@ -186,6 +190,15 @@
       </div>
     </el-form>
 
+    <!-- 路径选择弹窗 -->
+    <PathSelectorDialog
+      v-model="pathSelectorVisible"
+      :engine-id="form.engine_id || 0"
+      :title="pathSelectorTitle"
+      :initial-path="pathSelectorInitial"
+      @select="handlePathSelected"
+    />
+
     <template #footer>
       <el-button @click="visible = false">取消</el-button>
       <el-button type="primary" :loading="submitting" @click="handleSubmit">确认保存</el-button>
@@ -195,8 +208,8 @@
 
 <script lang="ts" setup>
 import { ref, watch, computed } from "vue";
-import { ElMessage, type CascaderProps } from "element-plus";
-import type { Job, CascaderNode, InfoList } from "@/types/index";
+import { ElMessage } from "element-plus";
+import type { Job } from "@/types/index";
 import RestClient from "@/utils/rest-client";
 import {
   JOB_SPEED_CONFIGS,
@@ -205,6 +218,7 @@ import {
 } from "@/const/index";
 import { useAllEngineListStore } from "@/stores";
 import { formatBytes } from "@/utils/format";
+import PathSelectorDialog from "./PathSelectorDialog.vue";
 
 const props = defineProps({
   modelValue: Boolean,
@@ -224,6 +238,11 @@ const visible = ref(false);
 const form = ref<Partial<Job>>({});
 const formRef = ref();
 const submitting = ref(false);
+
+const pathSelectorVisible = ref(false);
+const pathSelectorTitle = ref("选择源路径");
+const pathSelectorField = ref<"src_path" | "dst_path">("src_path");
+const pathSelectorInitial = ref("/");
 
 const allEngineListStore = useAllEngineListStore() as ReturnType<
   typeof useAllEngineListStore
@@ -250,43 +269,24 @@ const pathsOverlapWarning = computed(() => {
   return cleanDst.startsWith(cleanSrc) || cleanSrc.startsWith(cleanDst);
 });
 
-const srcPathList = ref<string[]>([]);
-const srcPathCascaderNode = ref<CascaderNode[]>([]);
-const dstPathList = ref<string[]>([]);
-const dstPathCascaderNode = ref<CascaderNode[]>([]);
-
-const cascaderSrcPathProps: CascaderProps = {
-  lazy: true,
-  checkStrictly: true,
-  lazyLoad: async (node, resolve) => {
-    const { pathLabels } = node;
-    const pathStr = pathLabels && pathLabels.length > 0 ? "/" + pathLabels.join("/") : "/";
-    const engineId = form.value.engine_id || 0;
-
-    let paths: string[] = [];
-    if (engineId) {
-      paths = await fetchPaths(engineId, pathStr);
-    }
-
-    const nodes = paths.map((path) => ({
-      value: path,
-      label: path,
-      leaf: false,
-    }));
-
-    resolve(nodes);
-  },
+const openPathSelector = (field: "src_path" | "dst_path") => {
+  if (!form.value.engine_id) {
+    ElMessage.warning("请先选择存储引擎");
+    return;
+  }
+  pathSelectorField.value = field;
+  pathSelectorTitle.value =
+    field === "src_path" ? "选择源路径 (Source Path)" : "选择目标路径 (Destination Path)";
+  pathSelectorInitial.value =
+    (field === "src_path" ? form.value.src_path : form.value.dst_path) || "/";
+  pathSelectorVisible.value = true;
 };
 
-const fetchPaths = async (engineId: number, pathStr: string): Promise<string[]> => {
-  try {
-    const infoList = await new RestClient().get<InfoList<string>>("/open-list", {
-      engine_id: engineId,
-      path: pathStr,
-    });
-    return (infoList?.list || []) as string[];
-  } catch (error) {
-    return [];
+const handlePathSelected = (path: string) => {
+  if (pathSelectorField.value === "src_path") {
+    form.value.src_path = path;
+  } else {
+    form.value.dst_path = path;
   }
 };
 
@@ -303,34 +303,12 @@ watch(
         enabled: 1,
         ...props.job,
       };
-      if (form.value.src_path) {
-        srcPathList.value = form.value.src_path.split("/").filter(Boolean);
-      } else {
-        srcPathList.value = [];
-      }
-      if (form.value.dst_path) {
-        dstPathList.value = form.value.dst_path.split("/").filter(Boolean);
-      } else {
-        dstPathList.value = [];
-      }
     }
   }
 );
 
 watch(visible, (val) => {
   emit("update:modelValue", val);
-});
-
-watch(srcPathList, (val) => {
-  if (val && val.length > 0) {
-    form.value.src_path = "/" + val.join("/");
-  }
-});
-
-watch(dstPathList, (val) => {
-  if (val && val.length > 0) {
-    form.value.dst_path = "/" + val.join("/");
-  }
 });
 
 const handleClose = () => {
