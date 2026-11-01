@@ -37,6 +37,7 @@ type SyncResult struct {
 	FilesFound   int      `json:"files_found"`
 	FilesSkipped int      `json:"files_skipped"`
 	FilesAdded   int      `json:"files_added"`
+	FilesDeleted int      `json:"files_deleted"`
 	FilesFailed  int      `json:"files_failed"`
 	DirsFound    int      `json:"dirs_found"`
 	Details      []string `json:"details"`
@@ -95,7 +96,7 @@ func (s *SyncService) doSync(job *models.Job, engine *models.Engine) (*SyncResul
 		return result, err
 	}
 
-	// 2. 如果是“仅新增”模式，先扫描目标目录获取已有文件清单
+	// 2. 如果是“仅新增”或“完全同步”模式，先扫描目标目录获取已有文件清单
 	dstFileMap := make(map[string]FileInfo)
 	if job.SyncMode == models.SyncModeAddOnly || job.SyncMode == models.SyncModeFull {
 		dstFiles, err := client.ListFilesDetailed(job.DstPath, int(job.Speed))
@@ -108,6 +109,8 @@ func (s *SyncService) doSync(job *models.Job, engine *models.Engine) (*SyncResul
 		}
 	}
 
+	srcFileNames := make(map[string]bool)
+
 	// 3. 逐个遍历源端文件，执行过滤与差异同步
 	for _, sf := range srcFiles {
 		if sf.IsDir {
@@ -115,6 +118,7 @@ func (s *SyncService) doSync(job *models.Job, engine *models.Engine) (*SyncResul
 			continue
 		}
 		result.FilesFound++
+		srcFileNames[sf.Name] = true
 
 		// 检查路径/名称排除通配符
 		if pathFilter.IsExcluded(sf.Name) {
@@ -130,8 +134,8 @@ func (s *SyncService) doSync(job *models.Job, engine *models.Engine) (*SyncResul
 			continue
 		}
 
-		// 增量模式：如果目标端已存在相同文件且大小一致，则跳过
-		if job.SyncMode == models.SyncModeAddOnly {
+		// 增量模式或全同步模式：如果目标端已存在相同文件且大小一致，则跳过
+		if job.SyncMode == models.SyncModeAddOnly || job.SyncMode == models.SyncModeFull {
 			if df, exists := dstFileMap[sf.Name]; exists {
 				if df.Size == sf.Size {
 					result.FilesSkipped++
@@ -160,8 +164,24 @@ func (s *SyncService) doSync(job *models.Job, engine *models.Engine) (*SyncResul
 		}
 	}
 
-	result.Details = append(result.Details, fmt.Sprintf("同步完成，发现文件: %d, 新增: %d, 跳过: %d, 失败: %d",
-		result.FilesFound, result.FilesAdded, result.FilesSkipped, result.FilesFailed))
+	// 5. 如果是“完全同步 (镜像)”模式，清理目标端比源端多出的文件
+	if job.SyncMode == models.SyncModeFull {
+		for _, df := range dstFileMap {
+			if !srcFileNames[df.Name] {
+				delErr := client.RemoveFile(job.DstPath, df.Name)
+				if delErr != nil {
+					result.FilesFailed++
+					result.Details = append(result.Details, fmt.Sprintf("删除多余文件失败: %s, 错误: %v", df.Name, delErr))
+				} else {
+					result.FilesDeleted++
+					result.Details = append(result.Details, fmt.Sprintf("删除多余文件 (镜像对齐): %s", df.Name))
+				}
+			}
+		}
+	}
+
+	result.Details = append(result.Details, fmt.Sprintf("同步完成，发现文件: %d, 新增: %d, 删除: %d, 跳过: %d, 失败: %d",
+		result.FilesFound, result.FilesAdded, result.FilesDeleted, result.FilesSkipped, result.FilesFailed))
 
 	return result, nil
 }

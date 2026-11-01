@@ -141,3 +141,102 @@ func TestSyncServiceAddOnlyDiffAndSync(t *testing.T) {
 	assert.Equal(t, 1, syncLog.FilesAdded)
 	assert.Equal(t, []string{"new.jpg"}, copiedFiles)
 }
+
+func TestSyncServiceFullSyncMirrorDeletion(t *testing.T) {
+	var copiedFiles []string
+	var removedFiles []string
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+
+		if r.URL.Path == "/api/fs/list" {
+			var req map[string]interface{}
+			_ = json.NewDecoder(r.Body).Decode(&req)
+			path, _ := req["path"].(string)
+
+			if path == "/source" {
+				w.Write([]byte(`{
+					"code": 200,
+					"message": "success",
+					"data": {
+						"total": 1,
+						"content": [
+							{"name": "keep.jpg", "size": 1000, "is_dir": false}
+						]
+					}
+				}`))
+				return
+			}
+
+			if path == "/target" {
+				w.Write([]byte(`{
+					"code": 200,
+					"message": "success",
+					"data": {
+						"total": 2,
+						"content": [
+							{"name": "keep.jpg", "size": 1000, "is_dir": false},
+							{"name": "obsolete.jpg", "size": 500, "is_dir": false}
+						]
+					}
+				}`))
+				return
+			}
+		}
+
+		if r.URL.Path == "/api/fs/copy" {
+			var req map[string]interface{}
+			_ = json.NewDecoder(r.Body).Decode(&req)
+			names, _ := req["names"].([]interface{})
+			for _, n := range names {
+				copiedFiles = append(copiedFiles, n.(string))
+			}
+			w.Write([]byte(`{"code": 200, "message": "success", "data": {"task_id": "copy_ok"}}`))
+			return
+		}
+
+		if r.URL.Path == "/api/fs/remove" {
+			var req map[string]interface{}
+			_ = json.NewDecoder(r.Body).Decode(&req)
+			names, _ := req["names"].([]interface{})
+			for _, n := range names {
+				removedFiles = append(removedFiles, n.(string))
+			}
+			w.Write([]byte(`{"code": 200, "message": "success", "data": {}}`))
+			return
+		}
+
+		w.WriteHeader(http.StatusNotFound)
+	}))
+	defer server.Close()
+
+	db := setupTestDB(t)
+	engine := &models.Engine{
+		Remark: "TestEngine",
+		Url:    server.URL,
+		Token:  "token",
+		UserId: 1,
+	}
+	require.NoError(t, db.Create(engine).Error)
+
+	job := &models.Job{
+		Remark:   "完全同步作业",
+		SrcPath:  "/source",
+		DstPath:  "/target",
+		EngineId: engine.ID,
+		UserId:   1,
+		SyncMode: models.SyncModeFull,
+		Enabled:  1,
+	}
+	require.NoError(t, db.Create(job).Error)
+
+	syncService := NewSyncService(db)
+	syncLog, err := syncService.ExecuteSync(job.ID)
+
+	require.NoError(t, err)
+	require.NotNil(t, syncLog)
+	assert.Equal(t, models.SyncStatusSuccess, syncLog.Status)
+
+	// 验证：目标端多出的 obsolete.jpg 应该被删除
+	assert.Equal(t, []string{"obsolete.jpg"}, removedFiles)
+}

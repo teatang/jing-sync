@@ -22,7 +22,7 @@ type Job struct {
 	EngineId uint   `json:"engine_id" gorm:"column:engine_id"`
 	UserId   uint   `json:"user_id" gorm:"column:user_id"`
 	Speed    uint8  `json:"speed" gorm:"column:speed;default:0"`       // 速度策略
-	SyncMode uint8  `json:"sync_mode" gorm:"column:sync_mode;default:1"` // 0:全同步 1:仅新增 2:移动
+	SyncMode uint8  `json:"sync_mode" gorm:"column:sync_mode"`         // 0:全同步 1:仅新增 2:移动
 	Method   string `json:"method" gorm:"column:method;size:50"`
 	Interval uint   `json:"interval" gorm:"column:interval;default:60"`   // 间隔分钟数
 	IsCron   uint8  `json:"is_cron" gorm:"column:is_cron;default:0"`     // 0:间隔 1:Cron表达式

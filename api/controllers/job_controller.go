@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"jing-sync/internal/models"
+	"jing-sync/internal/services"
 	"jing-sync/internal/services/db_services"
 	"jing-sync/internal/utils"
 
@@ -13,11 +14,13 @@ import (
 
 type JobController struct {
 	BaseController
+	db         *gorm.DB
 	jobService *db_services.JobService
 }
 
 func NewJobController(db *gorm.DB) *JobController {
 	return &JobController{
+		db:         db,
 		jobService: db_services.NewJobService(db),
 	}
 }
@@ -35,6 +38,9 @@ func (uc *JobController) CreateJob(c *gin.Context) {
 		uc.Error(c, http.StatusInternalServerError, err.Error())
 		return
 	}
+
+	// 动态添加/更新 Cron 调度
+	services.GetCronManager(uc.db).AddOrUpdateJob(&job)
 
 	uc.Success(c, job)
 }
@@ -68,7 +74,7 @@ func (uc *JobController) GetPageJobs(c *gin.Context) {
 	uc.Success(c, jobs)
 }
 
-// UpdateJob 更新用任务
+// UpdateJob 更新任务
 func (uc *JobController) UpdateJob(c *gin.Context) {
 	var job models.Job
 	if err := c.ShouldBindJSON(&job); err != nil {
@@ -84,6 +90,9 @@ func (uc *JobController) UpdateJob(c *gin.Context) {
 		}
 		return
 	}
+
+	// 动态更新 Cron 调度：先清空原有调度，防止重复添加，再注册新调度
+	services.GetCronManager(uc.db).AddOrUpdateJob(&job)
 
 	uc.Success(c, job)
 }
@@ -105,6 +114,9 @@ func (uc *JobController) DeleteJob(c *gin.Context) {
 		}
 		return
 	}
+
+	// 从 Cron 调度器中移除该任务
+	services.GetCronManager(uc.db).RemoveJob(job.ID)
 
 	uc.Success(c, job)
 }
@@ -132,6 +144,9 @@ func (uc *JobController) ToggleJob(c *gin.Context) {
 		uc.Error(c, http.StatusInternalServerError, err.Error())
 		return
 	}
+
+	// 更新 Cron 调度（启用则添加/更新，禁用则移除）
+	services.GetCronManager(uc.db).AddOrUpdateJob(job)
 
 	uc.Success(c, job)
 }
