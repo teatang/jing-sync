@@ -23,9 +23,13 @@ func InitDB() string {
 	var password string
 	var err error
 
-	utils.EnsureDir("data")
-
-	dbPath := fmt.Sprintf("data/%s", config.Cfg.DbName)
+	var dbPath string
+	if config.Cfg.DbName == ":memory:" {
+		dbPath = ":memory:"
+	} else {
+		utils.EnsureDir("data")
+		dbPath = fmt.Sprintf("data/%s", config.Cfg.DbName)
+	}
 	if !utils.FileExists(dbPath) {
 		db, err = gorm.Open(sqlite.Open(dbPath), &gorm.Config{})
 		password = AutoMigrate(db)

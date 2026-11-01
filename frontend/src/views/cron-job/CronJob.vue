@@ -96,9 +96,9 @@
           </template>
         </el-table-column>
 
-        <el-table-column fixed="right" label="操作" min-width="260">
+        <el-table-column fixed="right" label="操作" min-width="270">
           <template #default="{ row }">
-            <div class="flex items-center gap-1.5">
+            <div class="flex flex-wrap items-center gap-1.5 py-1">
               <el-button
                 size="small"
                 type="primary"

@@ -1,9 +1,9 @@
 <template>
   <el-container v-loading="mainStore.loading" class="h-screen w-screen overflow-hidden bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 transition-colors">
-    <!-- 左侧极简侧边栏 -->
+    <!-- 左侧极简侧边栏 (桌面端) -->
     <el-aside
       :width="isCollapse ? '64px' : '220px'"
-      class="border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col transition-all duration-300 select-none"
+      class="hidden md:flex border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex-col transition-all duration-300 select-none"
     >
       <!-- Logo 区域 -->
       <div class="h-16 flex items-center px-4 border-b border-slate-100 dark:border-slate-800/80 gap-3 overflow-hidden">
@@ -61,15 +61,70 @@
       </div>
     </el-aside>
 
+    <!-- 移动端侧边抽屉导航 -->
+    <el-drawer
+      v-model="mobileDrawerVisible"
+      direction="ltr"
+      size="240px"
+      class="md:hidden !p-0"
+      :with-header="false"
+    >
+      <div class="h-full flex flex-col bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100">
+        <div class="h-16 flex items-center px-4 border-b border-slate-100 dark:border-slate-800 gap-3">
+          <div class="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold text-lg">
+            <el-icon><Refresh /></el-icon>
+          </div>
+          <div class="font-bold text-base tracking-wide">
+            JingSync
+          </div>
+        </div>
+        <el-scrollbar class="flex-1 py-2">
+          <el-menu
+            router
+            :default-active="activeRoute"
+            class="!border-none !bg-transparent"
+            @select="mobileDrawerVisible = false"
+          >
+            <el-menu-item index="/cron-job">
+              <el-icon><AlarmClock /></el-icon>
+              <span>{{ $t('nav.jobs') || '定时同步' }}</span>
+            </el-menu-item>
+            <el-menu-item index="/engine">
+              <el-icon><Connection /></el-icon>
+              <span>{{ $t('nav.engines') || '存储引擎' }}</span>
+            </el-menu-item>
+            <el-menu-item index="/sync-logs">
+              <el-icon><Document /></el-icon>
+              <span>{{ $t('nav.logs') || '同步日志' }}</span>
+            </el-menu-item>
+            <el-menu-item index="/user-setting">
+              <el-icon><User /></el-icon>
+              <span>{{ $t('nav.users') || '用户管理' }}</span>
+            </el-menu-item>
+          </el-menu>
+        </el-scrollbar>
+      </div>
+    </el-drawer>
+
     <!-- 右侧主体内容区 -->
     <el-container class="flex flex-col flex-1 h-screen overflow-hidden">
       <!-- 极简头部工具栏 -->
-      <el-header class="h-16 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur px-6 flex items-center justify-between z-10">
-        <div class="text-sm font-medium text-slate-500 dark:text-slate-400">
-          {{ pageTitle }}
+      <el-header class="h-16 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur px-4 sm:px-6 flex items-center justify-between z-10">
+        <div class="flex items-center gap-3">
+          <!-- 移动端菜单按钮 -->
+          <button
+            type="button"
+            @click="mobileDrawerVisible = true"
+            class="md:hidden p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+          >
+            <el-icon :size="20"><Menu /></el-icon>
+          </button>
+          <div class="text-sm font-medium text-slate-600 dark:text-slate-300 truncate">
+            {{ pageTitle }}
+          </div>
         </div>
 
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2 sm:gap-3">
           <!-- 日夜模式切换 -->
           <ThemeSwitch />
 
@@ -129,7 +184,7 @@
       </el-header>
 
       <!-- 主视图 -->
-      <el-main class="flex-1 overflow-auto p-6 bg-slate-50 dark:bg-slate-950/60">
+      <el-main class="flex-1 overflow-auto p-3 sm:p-6 bg-slate-50 dark:bg-slate-950/60">
         <router-view />
       </el-main>
     </el-container>
@@ -155,6 +210,7 @@ import {
   Refresh,
   ArrowDown,
   SwitchButton,
+  Menu,
 } from "@element-plus/icons-vue";
 
 const route = useRoute();
@@ -163,6 +219,7 @@ const mainStore = useMainStore();
 const localeStore = useLocaleStore();
 
 const isCollapse = ref<boolean>(false);
+const mobileDrawerVisible = ref<boolean>(false);
 
 const activeRoute = computed(() => {
   return route.path === "/" ? "/cron-job" : route.path;
