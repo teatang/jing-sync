@@ -17,14 +17,14 @@
       <el-form-item
         label="密码 (Password)"
         prop="password"
-        :rules="[{ required: true, message: '请输入密码' }]"
+        :rules="passwordRules"
       >
         <el-input
           v-model="form.password"
           type="password"
-          placeholder="请输入登录密码"
           show-password
           clearable
+          :placeholder="mode === 'add' ? '请输入登录密码' : '留空表示不修改密码'"
         />
       </el-form-item>
     </el-form>
@@ -36,7 +36,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from "vue";
+import { ref, watch, computed } from "vue";
 import { ElMessage } from "element-plus";
 import { type User } from "@/types/index";
 import RestClient from "@/utils/rest-client";
@@ -60,12 +60,23 @@ const submitting = ref(false);
 const form = ref<Partial<User>>({});
 const formRef = ref();
 
+const passwordRules = computed(() => {
+  if (props.mode === "add") {
+    return [{ required: true, message: "请输入密码", trigger: "blur" }];
+  }
+  return [];
+});
+
 watch(
   () => props.modelValue,
   (val) => {
     visible.value = val;
-    if (val && props.user) {
-      form.value = { ...props.user };
+    if (val) {
+      if (props.mode === "edit" && props.user) {
+        form.value = { ...props.user, password: "" };
+      } else {
+        form.value = { username: "", password: "" };
+      }
     }
   }
 );
@@ -82,11 +93,15 @@ const handleSubmit = async () => {
   try {
     await formRef.value.validate();
     submitting.value = true;
+    const payload = { ...form.value };
+    if (props.mode === "edit" && !payload.password) {
+      delete payload.password;
+    }
     if (props.mode === "add") {
-      await new RestClient().post<number>("/user", form.value);
+      await new RestClient().post<number>("/user", payload);
       ElMessage.success("新增用户成功");
     } else {
-      await new RestClient().put<number>("/user", form.value);
+      await new RestClient().put<number>("/user", payload);
       ElMessage.success("更新用户成功");
     }
     emit("success");

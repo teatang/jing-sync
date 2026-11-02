@@ -29,11 +29,17 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 		return
 	}
 
+	if user.Username == "" || user.Password == "" {
+		uc.Error(c, http.StatusBadRequest, "Username and password cannot be empty")
+		return
+	}
+
 	if err := uc.userService.Create(&user); err != nil {
 		uc.Error(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
+	user.Password = ""
 	uc.Success(c, user)
 }
 
@@ -50,6 +56,7 @@ func (uc *UserController) GetUser(c *gin.Context) {
 		return
 	}
 
+	user.Password = ""
 	uc.Success(c, user)
 }
 
@@ -63,6 +70,10 @@ func (uc *UserController) GetPageUsers(c *gin.Context) {
 		return
 	}
 
+	for i := range users.List {
+		users.List[i].Password = ""
+	}
+
 	uc.Success(c, users)
 }
 
@@ -71,6 +82,16 @@ func (uc *UserController) UpdateUser(c *gin.Context) {
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
 		uc.Error(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if user.ID == 0 {
+		uc.Error(c, http.StatusBadRequest, "User ID is required")
+		return
+	}
+
+	if user.Username == "" {
+		uc.Error(c, http.StatusBadRequest, "Username cannot be empty")
 		return
 	}
 
@@ -83,6 +104,7 @@ func (uc *UserController) UpdateUser(c *gin.Context) {
 		return
 	}
 
+	user.Password = ""
 	uc.Success(c, user)
 }
 
