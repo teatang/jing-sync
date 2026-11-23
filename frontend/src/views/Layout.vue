@@ -5,14 +5,31 @@
       :width="isCollapse ? '64px' : '220px'"
       class="hidden md:flex border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex-col transition-all duration-300 select-none"
     >
-      <!-- Logo 区域 -->
-      <div class="h-16 flex items-center px-4 border-b border-slate-100 dark:border-slate-800/80 gap-3 overflow-hidden">
-        <div class="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold text-lg shrink-0">
-          <el-icon><Refresh /></el-icon>
+      <!-- 侧边栏顶部：Logo 与折叠切换按钮 -->
+      <div
+        class="h-16 flex items-center border-b border-slate-100 dark:border-slate-800/80 px-3.5 transition-all duration-300"
+        :class="isCollapse ? 'justify-center' : 'justify-between'"
+      >
+        <div v-show="!isCollapse" class="flex items-center gap-2.5 overflow-hidden">
+          <div class="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold text-lg shrink-0">
+            <el-icon><Refresh /></el-icon>
+          </div>
+          <div class="font-bold text-base tracking-wide whitespace-nowrap overflow-hidden text-ellipsis text-slate-800 dark:text-slate-100">
+            JingSync
+          </div>
         </div>
-        <div v-show="!isCollapse" class="font-bold text-base tracking-wide whitespace-nowrap overflow-hidden text-ellipsis">
-          JingSync
-        </div>
+
+        <button
+          type="button"
+          @click="isCollapse = !isCollapse"
+          class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center justify-center shrink-0"
+          :title="isCollapse ? '展开侧边栏' : '折叠侧边栏'"
+        >
+          <el-icon :size="18">
+            <Expand v-if="isCollapse" />
+            <Fold v-else />
+          </el-icon>
+        </button>
       </div>
 
       <!-- 导航菜单 -->
@@ -44,21 +61,6 @@
           </el-menu-item>
         </el-menu>
       </el-scrollbar>
-
-      <!-- 侧边栏底部折叠按钮 -->
-      <div class="p-3 border-t border-slate-100 dark:border-slate-800 flex justify-center">
-        <button
-          type="button"
-          @click="isCollapse = !isCollapse"
-          class="p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors w-full flex items-center justify-center"
-          :title="isCollapse ? '展开侧边栏' : '折叠侧边栏'"
-        >
-          <el-icon :size="16">
-            <Expand v-if="isCollapse" />
-            <Fold v-else />
-          </el-icon>
-        </button>
-      </div>
     </el-aside>
 
     <!-- 移动端侧边抽屉导航 -->
