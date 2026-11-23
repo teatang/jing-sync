@@ -7,13 +7,48 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"net/http/httptest"
 	"time"
 )
 
 type RequestOption struct {
-	Headers map[string]string
-	Timeout time.Duration // 默认30秒
-	Retry   int           // 默认不重试
+	Headers   map[string]string
+	Timeout   time.Duration // 默认30秒
+	Retry     int           // 默认不重试
+	Transport http.RoundTripper
+}
+
+var customTransport http.RoundTripper
+
+// SetCustomTransport 设置自定义 RoundTripper，供单元测试等场景 mock 网络请求
+func SetCustomTransport(t http.RoundTripper) {
+	customTransport = t
+}
+
+// HandlerTransport 将 http.Handler 直接转为 RoundTripper，避免真实网络调用
+type HandlerTransport struct {
+	Handler http.Handler
+}
+
+func (ht *HandlerTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	done := make(chan struct{})
+	rec := httptest.NewRecorder()
+	go func() {
+		ht.Handler.ServeHTTP(rec, req)
+		close(done)
+	}()
+
+	select {
+	case <-req.Context().Done():
+		return nil, req.Context().Err()
+	case <-done:
+		return rec.Result(), nil
+	}
+}
+
+// NewHandlerTransport 创建基于 Handler 的内存传输层
+func NewHandlerTransport(h http.Handler) *HandlerTransport {
+	return &HandlerTransport{Handler: h}
 }
 
 func Request(method, url string, body interface{}, opt *RequestOption) ([]byte, error) {
@@ -51,6 +86,11 @@ func Request(method, url string, body interface{}, opt *RequestOption) ([]byte, 
 	}
 
 	client := &http.Client{Timeout: opt.Timeout}
+	if opt.Transport != nil {
+		client.Transport = opt.Transport
+	} else if customTransport != nil {
+		client.Transport = customTransport
+	}
 	var resp *http.Response
 
 	// 重试逻辑

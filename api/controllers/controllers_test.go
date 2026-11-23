@@ -28,15 +28,16 @@ func setupControllerTestDB(t *testing.T) *gorm.DB {
 
 func TestEngineTestConnectionEndpoint(t *testing.T) {
 	// 模拟 OpenList HTTP 服务
-	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	mockHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		if r.URL.Path == "/api/me" {
 			w.Write([]byte(`{"code": 200, "message": "success"}`))
 			return
 		}
 		w.WriteHeader(http.StatusNotFound)
-	}))
-	defer mockServer.Close()
+	})
+	utils.SetCustomTransport(utils.NewHandlerTransport(mockHandler))
+	defer utils.SetCustomTransport(nil)
 
 	db := setupControllerTestDB(t)
 	ec := NewEngineController(db)
@@ -50,7 +51,7 @@ func TestEngineTestConnectionEndpoint(t *testing.T) {
 
 	// 测试请求
 	reqBody, _ := json.Marshal(map[string]string{
-		"url":   mockServer.URL,
+		"url":   "http://mock-openlist.local",
 		"token": "valid-token",
 	})
 	req, _ := http.NewRequest(http.MethodPost, "/api/engine/test", bytes.NewBuffer(reqBody))

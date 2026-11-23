@@ -1,6 +1,7 @@
 package route
 
 import (
+	"os"
 	"testing"
 
 	"jing-sync/boot/config"
@@ -11,6 +12,9 @@ import (
 
 // TestRouteRegistrationNoConflict 验证路由注册不会因为 Gin 路由树通配符冲突而 panic
 func TestRouteRegistrationNoConflict(t *testing.T) {
+	t.Cleanup(func() {
+		_ = os.RemoveAll("data")
+	})
 	gin.SetMode(gin.TestMode)
 	config.SetDefaultConfig(config.EnvTypeTest)
 	config.Cfg.DbName = ":memory:"

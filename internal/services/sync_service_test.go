@@ -3,10 +3,10 @@ package services
 import (
 	"encoding/json"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	"jing-sync/internal/models"
+	"jing-sync/internal/utils"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -47,8 +47,8 @@ func TestSyncServiceExecuteSyncOverlapProtection(t *testing.T) {
 func TestSyncServiceAddOnlyDiffAndSync(t *testing.T) {
 	var copiedFiles []string
 
-	// 模拟 OpenList HTTP 服务
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	// 使用内存传输层模拟 OpenList HTTP 服务
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 
 		if r.URL.Path == "/api/fs/list" {
@@ -101,13 +101,14 @@ func TestSyncServiceAddOnlyDiffAndSync(t *testing.T) {
 		}
 
 		w.WriteHeader(http.StatusNotFound)
-	}))
-	defer server.Close()
+	})
+	utils.SetCustomTransport(utils.NewHandlerTransport(handler))
+	defer utils.SetCustomTransport(nil)
 
 	db := setupTestDB(t)
 	engine := &models.Engine{
 		Remark: "TestEngine",
-		Url:    server.URL,
+		Url:    "http://mock-openlist.local",
 		Token:  "token",
 		UserId: 1,
 	}
@@ -146,7 +147,7 @@ func TestSyncServiceFullSyncMirrorDeletion(t *testing.T) {
 	var copiedFiles []string
 	var removedFiles []string
 
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 
 		if r.URL.Path == "/api/fs/list" {
@@ -207,13 +208,14 @@ func TestSyncServiceFullSyncMirrorDeletion(t *testing.T) {
 		}
 
 		w.WriteHeader(http.StatusNotFound)
-	}))
-	defer server.Close()
+	})
+	utils.SetCustomTransport(utils.NewHandlerTransport(handler))
+	defer utils.SetCustomTransport(nil)
 
 	db := setupTestDB(t)
 	engine := &models.Engine{
 		Remark: "TestEngine",
-		Url:    server.URL,
+		Url:    "http://mock-openlist.local",
 		Token:  "token",
 		UserId: 1,
 	}

@@ -3,10 +3,10 @@ package services
 import (
 	"encoding/json"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	"jing-sync/internal/models"
+	"jing-sync/internal/utils"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -23,8 +23,8 @@ func setupTestDB(t *testing.T) *gorm.DB {
 }
 
 func TestOpenListClientOperations(t *testing.T) {
-	// 启动 Mock HTTP 服务器模拟 OpenList API
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	// 使用内存传输层模拟 OpenList API，无需启动网络端口
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 
 		switch r.URL.Path {
@@ -73,13 +73,14 @@ func TestOpenListClientOperations(t *testing.T) {
 			w.WriteHeader(http.StatusNotFound)
 			w.Write([]byte(`{"code": 404, "message": "not found"}`))
 		}
-	}))
-	defer server.Close()
+	})
+	utils.SetCustomTransport(utils.NewHandlerTransport(handler))
+	defer utils.SetCustomTransport(nil)
 
 	db := setupTestDB(t)
 	engine := &models.Engine{
 		Remark: "Test Engine",
-		Url:    server.URL,
+		Url:    "http://mock-openlist.local",
 		Token:  "test-token",
 		UserId: 1,
 	}

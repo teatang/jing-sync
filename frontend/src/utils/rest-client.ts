@@ -103,7 +103,7 @@ class RestClient {
     return this.request<T>(endpoint, { method: "PUT", body });
   }
 
-  public delete<T>(endpoint: string, body: unknown): Promise<T> {
+  public delete<T>(endpoint: string, body?: unknown): Promise<T> {
     return this.request<T>(endpoint, { method: "DELETE", body });
   }
 }

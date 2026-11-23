@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"math/big"
 	"os"
+	"path/filepath"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
@@ -59,6 +60,13 @@ func ReadOrSet(fileName string, defaultValue string, force bool) (string, error)
 			}
 			return string(data), nil
 		} else if !os.IsNotExist(err) {
+			return "", err
+		}
+	}
+
+	dir := filepath.Dir(fileName)
+	if dir != "" && dir != "." {
+		if err := os.MkdirAll(dir, 0755); err != nil {
 			return "", err
 		}
 	}
