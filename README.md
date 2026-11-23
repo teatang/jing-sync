@@ -1,6 +1,6 @@
 # Jing-Sync
 
-[English](README.me) | [简体中文](README.md)
+[English](README_en.md) | [简体中文](README.md)
 
 Jing-Sync 是一个功能强大、现代化的全栈文件同步与管理 Web 应用程序。它支持通过 OpenList / AList 等存储引擎进行跨目录、跨网盘的高效文件同步、定时调度、镜像对齐以及详细的同步日志审计。
 

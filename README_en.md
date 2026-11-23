@@ -1,6 +1,6 @@
 # Jing-Sync
 
-[English](README.me) | [简体中文](README.md)
+[English](README_en.md) | [简体中文](README.md)
 
 Jing-Sync is a modern, high-performance, full-stack file synchronization and management web application. It connects with cloud storage engines such as OpenList and AList, providing efficient cross-directory and cross-drive file synchronization, cron job scheduling, mirror alignment, file filtering, and detailed audit logging.
 
