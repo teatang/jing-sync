@@ -111,7 +111,7 @@
     <!-- 右侧主体内容区 -->
     <el-container class="flex flex-col flex-1 h-screen overflow-hidden">
       <!-- 极简头部工具栏 -->
-      <el-header class="h-16 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur px-4 sm:px-6 flex items-center justify-between z-10">
+      <el-header class="!h-16 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur px-4 sm:px-6 flex items-center justify-between z-10">
         <div class="flex items-center gap-3">
           <!-- 移动端菜单按钮 -->
           <button

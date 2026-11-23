@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="jingBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563eb" />
+      <stop offset="45%" stop-color="#4f46e5" />
+      <stop offset="100%" stop-color="#06b6d4" />
+    </linearGradient>
+    <linearGradient id="jingWhite" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#e0f2fe" />
+    </linearGradient>
+    <linearGradient id="jingGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#a5f3fc" />
+    </linearGradient>
+    <filter id="jingShadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="5" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.32" />
+    </filter>
+  </defs>
+
+  <!-- Squircle App Icon Container -->
+  <rect x="10" y="10" width="108" height="108" rx="28" fill="url(#jingBg)" filter="url(#jingShadow)" />
+
+  <!-- Subtle glass highlight top edge -->
+  <path d="M 38 11.5 Q 64 12 90 11.5" stroke="#ffffff" stroke-opacity="0.35" stroke-width="2" stroke-linecap="round" fill="none" />
+
+  <!-- Inner subtle border -->
+  <rect x="10.5" y="10.5" width="107" height="107" rx="27.5" fill="none" stroke="#ffffff" stroke-opacity="0.18" stroke-width="1.2" />
+
+  <!-- Sync Rotating Arrows -->
+  <g transform="translate(18.4, 18.4) scale(3.8)" fill="none" stroke="url(#jingWhite)" stroke-width="2.35" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Top-Right Arc & Arrow -->
+    <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+    <path d="M3 3v5h5" />
+
+    <!-- Bottom-Left Arc & Arrow -->
+    <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
+    <path d="M16 21h5v-5" />
+  </g>
+
+  <!-- Central Glowing Pulse / Crystal Sync Core -->
+  <circle cx="64" cy="64" r="5" fill="url(#jingGlow)" />
+  <circle cx="64" cy="64" r="2.5" fill="#ffffff" />
+</svg>
